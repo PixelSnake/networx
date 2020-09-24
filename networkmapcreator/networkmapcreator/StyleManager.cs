@@ -18,13 +18,28 @@ namespace NetworkMapCreator
         public event StyleChangedEventHandler StyleChanged;
 
         FileSystemWatcher Watcher;
-        public Dictionary<string, StyleSet> Styles { get; } = new Dictionary<string, StyleSet>();
+        private Dictionary<string, StyleSet> Styles { get; } = new Dictionary<string, StyleSet>();
         public Dictionary<string, Font> Fonts { get; } = new Dictionary<string, Font>();
 
         public StyleManager()
         {
             Watcher = new FileSystemWatcher();
             Watcher.Changed += Stylesheet_Changed;
+        }
+
+        public StyleSet GetStyle(string selector)
+        {
+            var parts = selector.Split('.');
+            var element = parts[0];
+            var classes = parts.SubArray(1, parts.Length - 1);
+
+            for (int i = classes.Length; i >= 0; i--)
+            {
+                var _selector = element + (i > 0 ? "." : "") + string.Join(".", classes.SubArray(0, i));
+                if (Styles.ContainsKey(_selector)) return Styles[_selector];
+            }
+
+            return StyleSet.Default;
         }
 
         public void SetStylesheet(string filename)

@@ -23,6 +23,9 @@ namespace NetworkMapCreator
             Bottom
         }
 
+        /// <summary>
+        /// Station Prominence decides which lines will be displayed next to the name
+        /// </summary>
         public enum Prominence
         {
             Default,
@@ -49,14 +52,14 @@ namespace NetworkMapCreator
 
         public StyleSet Style;
 
-        public Point label_offset = new Point(0, 0);
+        public Point LabelOffset = new Point(0, 0);
         public LabelPivot Pivot = LabelPivot.Center;
 
-        private bool hover = false;
-        public bool IsHovered { get { return hover; } }
+        private bool _isHovered = false;
+        public bool IsHovered { get { return _isHovered; } }
 
-        private bool selected = false;
-        public bool IsSelected { get { return selected; } set { selected = value; } }
+        private bool _isSelected = false;
+        public bool IsSelected { get { return _isSelected; } set { _isSelected = value; } }
 
         public string Name;
 
@@ -105,51 +108,30 @@ namespace NetworkMapCreator
         private List<Line> Lines = new List<Line>();
 
         bool multiple { get { return seg_count > 2 || count_lines > 1; } }
-        int seg_count { get { return left + top + bottom + right; } }
-        int left
+        int seg_count { get { return countSegmentsLeft + countSegmentsTop + countSegmentsBottom + countSegmentsRight; } }
+        int countSegmentsLeft
         {
-            get
-            {
-                var sum = 0;
-                foreach (var seg in SegmentsLeft)
-                    sum += seg.SubSegments.Count;
-                return sum;
-            }
+            get => SegmentsLeft.Select(seg => seg.SubSegments.Count).Sum();
         }
-        int top
+        int countSegmentsTop
         {
-            get
-            {
-                var sum = 0;
-                foreach (var seg in SegmentsTop)
-                    sum += seg.SubSegments.Count;
-                return sum;
-            }
+            get => SegmentsTop.Select(seg => seg.SubSegments.Count).Sum();
         }
-        int bottom
+        int countSegmentsBottom
         {
-            get
-            {
-                var sum = 0;
-                foreach (var seg in SegmentsBottom)
-                    sum += seg.SubSegments.Count;
-                return sum;
-            }
+            get => SegmentsBottom.Select(seg => seg.SubSegments.Count).Sum();
         }
-        int right
+        int countSegmentsRight
         {
-            get
-            {
-                var sum = 0;
-                foreach (var seg in SegmentsRight)
-                    sum += seg.SubSegments.Count;
-                return sum;
-            }
+            get => SegmentsRight.Select(seg => seg.SubSegments.Count).Sum();
         }
-        int top_or_bottom { get { return bottom + top; } }
-        int left_or_right { get { return left + right; } }
+        int countSegmentsVertical { get => countSegmentsBottom + countSegmentsTop; }
+        int countSegmentsHorizontal { get => countSegmentsLeft + countSegmentsRight; }
 
-        /* takes the color of the last added line, if connections is greater than 1, becomes white */
+        /* takes the color of the last added line. If connections is greater than 1, becomes white */
+        /// <summary>
+        /// Contains the line with the biggest width connected to this station
+        /// </summary>
         public Line Line = null;
 
         public Station(Map m, string name, Point location)
@@ -234,21 +216,21 @@ namespace NetworkMapCreator
         private void ReloadStyle()
         {
             var selector = "station";
-            if (multiple)
-                selector = "station.multiple";
-            else if (Line != null && Line.IsBright)
-                selector = "station.bright";
-            Style = Map.StyleManager.Styles[selector];
+
+            if (multiple) selector += ".multiple";
+            if (Line != null && Line.IsBright) selector += ".bright";
+
+            Style = Map.StyleManager.GetStyle(selector);
         }
 
         public bool MouseMove(MouseEventArgs e)
         {
-            return hover = new Vector3(e.Location).Distance(new Vector3(Location)) < Map.STATION_MOUSE_SNAP_DIST;
+            return _isHovered = new Vector3(e.Location).Distance(new Vector3(Location)) < Map.STATION_MOUSE_SNAP_DIST;
         }
 
         public void MouseDoubleClick(MouseEventArgs e)
         {
-            if (hover)
+            if (_isHovered)
                 new StationEditor(this).ShowDialog();
         }
 
@@ -257,10 +239,9 @@ namespace NetworkMapCreator
             var l = GetCorrectList(n);
             if (l.Contains(n))
                 return;
-            InsertIntoListSorted(l, n, l == SegmentsLeft || l == SegmentsRight);
 
+            InsertIntoListSorted(l, n, l == SegmentsLeft || l == SegmentsRight);
             n.SubSegments.CollectionChanged += Segment_SubSegments_Changed;
-            
             RecalcParameters();
         }
 
@@ -375,9 +356,9 @@ namespace NetworkMapCreator
 
         private void RecalcParameters()
         {
-            ReloadStyle();
             RecalcLines();
             RecalcDimensions();
+            ReloadStyle();
 
             Collection<Segment>[] lists = { SegmentsLeft, SegmentsTop, SegmentsRight, SegmentsBottom };
 
@@ -486,7 +467,7 @@ namespace NetworkMapCreator
             {
                 var list = SegmentsLeft;
 
-                if (left < 2)
+                if (countSegmentsLeft < 2)
                     return Location;
 
                 int y = -_cached_height_left / 2 + s.Width / 2;
@@ -500,7 +481,7 @@ namespace NetworkMapCreator
             {
                 var list = SegmentsRight;
 
-                if (right < 2)
+                if (countSegmentsRight < 2)
                     return Location;
 
                 int y = -_cached_height_right / 2 + s.Width / 2;
@@ -514,7 +495,7 @@ namespace NetworkMapCreator
             {
                 var list = SegmentsTop;
 
-                if (top < 2)
+                if (countSegmentsTop < 2)
                     return Location;
 
                 int x = -_cached_width_top / 2 + s.Width / 2;
@@ -528,7 +509,7 @@ namespace NetworkMapCreator
             {
                 var list = SegmentsBottom;
 
-                if (bottom < 2)
+                if (countSegmentsBottom < 2)
                     return Location;
 
                 int x = -_cached_width_bottom / 2 + s.Width / 2;
@@ -572,8 +553,8 @@ namespace NetworkMapCreator
 
             if (multiple)
             {
-                int w = Width;
-                int h = Height;
+                int w = Width + 10;
+                int h = Height + 10;
                 var padding = Style.Padding;
 
                 if (Style.Width.SizeMode == CSSSizeMode.Pixel)
@@ -622,11 +603,11 @@ namespace NetworkMapCreator
                 ge.DrawRoundRectangle(new Pen(border_color, Style.Border.Width.Value), -w / 2, -h / 2, w, h, Style.Border.Radius.Left);
             }
 
-            if (hover || selected)
+            if (_isHovered || _isSelected)
             {
                 var s = Map.STATION_MOUSE_SNAP_DIST;
 
-                if (hover)
+                if (_isHovered)
                     g.FillEllipse(new SolidBrush(Color.FromArgb(0x7F, Map.SelectionColor1)), -s, -s, 2 * s, 2 * s);
 
                 g.DrawEllipse(new Pen(Map.SelectionColor1, 2), -s, -s, 2 * s, 2 * s);
@@ -674,7 +655,7 @@ namespace NetworkMapCreator
             }
 
             /* Load the style settings */
-            var Style = Map.StyleManager.Styles[selector];
+            var Style = Map.StyleManager.GetStyle(selector);
             var cssX = Style.X;
             var cssY = Style.Y;
             var cssWidth = Style.Width;
@@ -712,7 +693,7 @@ namespace NetworkMapCreator
 
             /* If this line color is considered "bright", we use different settings for the font color */
             if (Line != null && Line.IsBright)
-                cssTextColor = Map.StyleManager.Styles["station label.bright"].Color.GetColorAuto(Line.c1);
+                cssTextColor = Map.StyleManager.GetStyle("station label.bright").Color.GetColorAuto(Line.c1);
 
             var _offset_x = 0;
             var _offset_y = 0;
@@ -724,14 +705,14 @@ namespace NetworkMapCreator
                     if (cssX.SizeMode == CSSSizeMode.Pixel)
                         _offset_x = cssX.Value;
                     else
-                        _offset_x = label_offset.X;
+                        _offset_x = LabelOffset.X;
                     if (cssY.SizeMode == CSSSizeMode.Pixel)
                         _offset_y = cssY.Value;
                     break;
 
                 case CSSPosition.Relative:
-                    _offset_x = label_offset.X;
-                    _offset_y = label_offset.Y;
+                    _offset_x = LabelOffset.X;
+                    _offset_y = LabelOffset.Y;
 
                     if (cssX.SizeMode == CSSSizeMode.Pixel)
                         _offset_x += cssX.Value;
@@ -790,7 +771,7 @@ namespace NetworkMapCreator
             if (l.c1.GetBrightness() > Map.BRIGHTNESS_LIMIT)
                 selector = "linelabel.bright";
 
-            var style = Map.StyleManager.Styles[selector];
+            var style = Map.StyleManager.GetStyle(selector);
             var padding = style.Padding;
             var margin = style.Margin;
             var lw = _l.Width + padding.Left + padding.Right;
@@ -827,7 +808,7 @@ namespace NetworkMapCreator
                 var selector = "linelabel";
                 if (lines[i].c1.GetBrightness() > Map.BRIGHTNESS_LIMIT)
                     selector = "linelabel.bright";
-                var style = Map.StyleManager.Styles[selector];
+                var style = Map.StyleManager.GetStyle(selector);
 
                 var l = g.MeasureString(lines[i].Name, Font);
                 widths.Add(l.Width +
@@ -1005,8 +986,8 @@ namespace NetworkMapCreator
             ret.SetAttribute("x", Location.X + "");
             ret.SetAttribute("y", Location.Y + "");
             ret.SetAttribute("rotation", RotationAngle + "");
-            ret.SetAttribute("label_x", label_offset.X + "");
-            ret.SetAttribute("label_y", label_offset.Y + "");
+            ret.SetAttribute("label_x", LabelOffset.X + "");
+            ret.SetAttribute("label_y", LabelOffset.Y + "");
             ret.SetAttribute("pivot", Pivot + "");
             ret.SetAttribute("prominence", prominence + "");
 
@@ -1026,8 +1007,8 @@ namespace NetworkMapCreator
             data.AddRange(BitConverter.GetBytes(Location.X));
             data.AddRange(BitConverter.GetBytes(Location.Y));
             data.AddRange(BitConverter.GetBytes((short)RotationAngle));
-            data.AddRange(BitConverter.GetBytes((short)label_offset.X));
-            data.AddRange(BitConverter.GetBytes((short)label_offset.Y));
+            data.AddRange(BitConverter.GetBytes((short)LabelOffset.X));
+            data.AddRange(BitConverter.GetBytes((short)LabelOffset.Y));
             data.Add((byte)Pivot);
             data.Add((byte)prominence);
 

@@ -130,7 +130,7 @@ namespace NetworkMapCreator.EditorElements
             if (Line != null && Line.IsBright)
                 selector += ".bright";
 
-            Style = Map.StyleManager.Styles[selector];
+            Style = Map.StyleManager.GetStyle(selector);
         }
 
         private void SubSegments_Changed(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

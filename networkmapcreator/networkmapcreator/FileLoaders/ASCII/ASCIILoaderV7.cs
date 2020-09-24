@@ -75,8 +75,8 @@ namespace NetworkMapCreator.FileLoaders.ASCII
                 p.Y = int.Parse(s.GetAttribute("y"));
                 var ns = new Station(m, name, p);
                 ns.RotationAngle = int.Parse(s.GetAttribute("rotation"));
-                ns.label_offset.X = int.Parse(s.GetAttribute("label_x"));
-                ns.label_offset.Y = int.Parse(s.GetAttribute("label_y"));
+                ns.LabelOffset.X = int.Parse(s.GetAttribute("label_x"));
+                ns.LabelOffset.Y = int.Parse(s.GetAttribute("label_y"));
                 try
                 {
                     var X = float.Parse(s.GetAttribute("pivot_x"));

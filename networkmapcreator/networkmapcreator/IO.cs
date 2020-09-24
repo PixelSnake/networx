@@ -236,8 +236,8 @@ namespace NetworkMapCreator
 
                                 var ns = new Station(m, Name, new Point(X, Y));
                                 ns.RotationAngle = Rotation;
-                                ns.label_offset.X = LabelX;
-                                ns.label_offset.Y = LabelY;
+                                ns.LabelOffset.X = LabelX;
+                                ns.LabelOffset.Y = LabelY;
                                 ns.Pivot = Pivot;
                                 ns.prominence = Prominence;
 
@@ -371,11 +371,11 @@ namespace NetworkMapCreator
                 PointF pivot = Station.Pivot2Point(s.Pivot);
 
                 // without height and width
-                int lx_ = (int)(s.Location.X + s.label_offset.X - pivot.X * tw) - margin;
-                int ly_ = (int)(s.Location.Y + s.label_offset.Y - pivot.Y * th) - margin;
+                int lx_ = (int)(s.Location.X + s.LabelOffset.X - pivot.X * tw) - margin;
+                int ly_ = (int)(s.Location.Y + s.LabelOffset.Y - pivot.Y * th) - margin;
                 // x and y with height and width
-                int lxw = (int)(s.Location.X + s.label_offset.X + (pivot.X * tw + tw)) + margin * 2;
-                int lyh = (int)(s.Location.Y + s.label_offset.Y + (pivot.Y * th + th)) + margin * 2;
+                int lxw = (int)(s.Location.X + s.LabelOffset.X + (pivot.X * tw + tw)) + margin * 2;
+                int lyh = (int)(s.Location.Y + s.LabelOffset.Y + (pivot.Y * th + th)) + margin * 2;
 
                 int x_ = Math.Max(lxw, s.Location.X);
                 int y_ = Math.Max(lyh, s.Location.Y);
