@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<shortcuts>
+  <ScFileNew shortcut="131150" />
+  <ScFileOpen shortcut="131151" />
+  <ScFileSave shortcut="131155" />
+  <ScFileSaveAs shortcut="196691" />
+  <ScFileExportImage shortcut="0" />
+  <ScFileExportSVG shortcut="0" />
+  <ScEditUndo shortcut="131162" />
+  <ScEditRedo shortcut="131161" />
+  <ScEditTrackEditor shortcut="131156" />
+  <ScEditStationEditor shortcut="131157" />
+  <ScConnectionEditor shortcut="131154" />
+  <ScEditSelectStylesheet shortcut="0" />
+  <ScEditSettings shortcut="0" />
+  <ScViewLinesOverview shortcut="0" />
+  <ScViewSegmentsOverview shortcut="0" />
+  <ScViewStationsOverview shortcut="0" />
+  <ScToolsSelect shortcut="112" />
+  <ScToolsCreate shortcut="113" />
+  <ScToolsConnect shortcut="114" />
+</shortcuts>

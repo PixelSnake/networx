@@ -1,0 +1,111 @@
+@import 'https://fonts.googleapis.com/css?family=Roboto';
+
+body {
+    font-family: 'Roboto', sans-serif;
+    
+    margin: 0px;
+}
+
+header {
+    position: relative;
+    
+    height: 50px;
+    width: 100%;
+    
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#eeeeee+0,e5e5e5+100 */
+    background: #eeeeee; /* Old browsers */
+    background: -moz-linear-gradient(top,  #eeeeee 0%, #e5e5e5 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top,  #eeeeee 0%,#e5e5e5 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom,  #eeeeee 0%,#e5e5e5 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#e5e5e5',GradientType=0 ); /* IE6-9 */
+
+    border-bottom: 1px solid #b7b7b7;
+}
+
+header a {
+    display: inline-block;
+    position: relative;
+    padding: 16px;
+    color: #000;
+    border-right: 1px solid #b2b2b2;
+}
+header a:hover {
+    box-shadow: inset 0px 0px 40px 0px rgba(0, 0, 0, 0.17);
+}
+
+main {
+    padding-top: 15px
+}
+
+div.bug {
+    padding-left: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+div.bug.accepted, div.bug.fixed {
+    background: rgba(0, 255, 88, 0.32);
+}
+
+div.bug.refused {
+    background: rgba(255, 66, 66, 0.32);
+}
+
+div.bug > div.label {
+    position: relative;
+    margin-right: 5px;
+    
+    text-transform: uppercase;
+    font-weight: 600;
+    background: #0091ac;
+    padding: 2px;
+    font-size: 14px;
+    color: #fff;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+div.bug > div.label.important {
+    background: #eacf00;
+}
+
+div.bug > div.title {
+    position: relative;
+    
+    display: inline-block;
+    font-weight: 600;
+    font-size: 16px;
+    margin-top: 2px;
+}
+
+div.bug > div.author {
+    display: inline-block;
+    font-size: 12px;
+}
+
+div.bug > div.content {
+    margin: 0px;
+    padding: 8px;
+    width: 80%;
+}
+
+div.content {
+    margin-left: 15px;
+}
+
+a {
+    color: #0091ac;
+    text-decoration: none;
+}
+
+div.button, a.button {
+    display: inline-block;
+    padding: 5px;
+    background: #ffffff;
+    border: 1px solid #a8a8a8;
+    cursor: pointer;
+    color: #000;
+}
+div.button:hover, a.button:hover {
+    background: #c7c7c7;
+}

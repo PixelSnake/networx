@@ -1,0 +1,105 @@
+/* the single trainstation */
+station {
+    background: #fff;
+    border: 3px solid auto;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+}
+station.bright {
+    background: #fff;
+    border: 3px solid #333;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+}
+
+/* trainstation with more than one line connected */
+station.multiple {
+    background: #fff;
+	padding: 3px;
+    width: auto;
+    height: auto;
+    border: 2px solid #000;
+    border-radius: 3px;
+}
+
+station label {
+    position: relative;
+    color: #000;
+    background: #000;
+}
+
+station.ending_default label {
+    padding: 0 3;
+    color: #000;
+    background: rgba(0, 0, 0, 0.01);
+}
+
+station.ending label {
+    color: #000;
+    background: auto;
+}
+
+station.all label {
+    color: #000;
+    background: #f00;
+}
+
+station label.bright {
+    color: #000;
+    background: #f00;
+}
+
+segment {
+    background: auto;
+	margin: 2px;
+}
+segment.bright {
+    background: auto;
+	border: 1px solid #000;
+}
+
+segment.steps {
+    border-radius: 20px;
+	margin: 2px;
+}
+segment.steps.bright {
+    border-radius: 20px;
+	border: 1px solid #000;
+}
+
+segment.curved {
+    background: auto;
+	margin: 2px;
+}
+segment.curved.bright {
+    background: auto;
+	border: 1px solid #000;
+}
+
+segment.wave {
+    background: auto;
+	margin: 2px;
+}
+segment.wave.bright {
+    background: auto;
+	border: 1px solid #000;
+}
+
+linelabel {
+    border-radius: 10px;
+    padding: 0 5;
+    color: auto;
+    background: #fff;
+    border: 3px solid auto;
+    margin: 5 0 0 5;
+}
+linelabel.bright {
+    border-radius: 10px;
+    padding: 0 3;
+    color: auto;
+    background: #fff;
+    border: 3px solid auto;
+    margin: 5 0 0 5;
+}
