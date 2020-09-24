@@ -81,6 +81,21 @@ namespace NetworkMapCreator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-16&quot;?&gt;
+        ///&lt;!--DockPanel configuration file. Author: Weifen Luo, all rights reserved.--&gt;
+        ///&lt;!--!!! AUTOMATICALLY GENERATED FILE. DO NOT MODIFY !!!--&gt;
+        ///&lt;DockPanel FormatVersion=&quot;1.0&quot; DockLeftPortion=&quot;0.25&quot; DockRightPortion=&quot;0.224811083123426&quot; DockTopPortion=&quot;0.25&quot; DockBottomPortion=&quot;0.25&quot; ActiveDocumentPane=&quot;0&quot; ActivePane=&quot;3&quot;&gt;
+        ///  &lt;Contents Count=&quot;6&quot;&gt;
+        ///    &lt;Content ID=&quot;0&quot; PersistString=&quot;NetworkMapCreator.WelcomePage&quot; AutoHidePortion=&quot;0.25&quot; IsHidden=&quot;False&quot; IsFloat=&quot;False&quot; /&gt;
+        ///     [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string layout_default {
+            get {
+                return ResourceManager.GetString("layout_default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon nmc {

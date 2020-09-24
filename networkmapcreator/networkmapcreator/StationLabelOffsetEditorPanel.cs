@@ -14,7 +14,7 @@ namespace NetworkMapCreator
         bool dragmode = false;
         Point center = new Point();
 
-        public EventHandler OnOffsetChanged;
+        public event EventHandler OffsetChanged;
 
         public StationLabelOffsetEditorPanel()
         {
@@ -58,7 +58,7 @@ namespace NetworkMapCreator
             {
                 LabelOffset.X = e.Location.X - center.X;
                 LabelOffset.Y = e.Location.Y - center.Y;
-                OnOffsetChanged?.Invoke(this, new EventArgs());
+                OffsetChanged?.Invoke(this, new EventArgs());
             }
         }
 

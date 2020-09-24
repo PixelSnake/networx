@@ -14,6 +14,7 @@ namespace NetworkMapCreator.EditorElements
     {
         public Line Line;
         public SegmentDirection Direction;
+        public LineLabelDisplayMode LineLabelDisplay;
 
         #region Cache
         public BezierCurve CachedCurvedPath { get; private set; }
@@ -170,6 +171,9 @@ namespace NetworkMapCreator.EditorElements
             if (Direction != SegmentDirection.Default)
                 ret.SetAttribute("direction", Direction + "");
 
+            if (LineLabelDisplay != LineLabelDisplayMode.Default)
+                ret.SetAttribute("label", LineLabelDisplay + "");
+
             return ret;
         }
 
@@ -185,5 +189,26 @@ namespace NetworkMapCreator.EditorElements
         Default = 0,
         Forward,
         Backward
+    }
+
+    public static class SegmentDirectionExtensions
+    {
+        public static SegmentDirection Next(this SegmentDirection d)
+        {
+            switch (d)
+            {
+                case SegmentDirection.Default:
+                    return SegmentDirection.Forward;
+
+                case SegmentDirection.Forward:
+                    return SegmentDirection.Backward;
+
+                case SegmentDirection.Backward:
+                    return SegmentDirection.Default;
+
+                default:
+                    return SegmentDirection.Default;
+            }
+        }
     }
 }

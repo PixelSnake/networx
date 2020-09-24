@@ -75,8 +75,8 @@ namespace NetworkMapCreator.FileLoaders.ASCII
                 p.Y = int.Parse(s.GetAttribute("y"));
                 var ns = new Station(m, name, p);
                 ns.RotationAngle = int.Parse(s.GetAttribute("rotation"));
-                ns.label_offset.X = int.Parse(s.GetAttribute("label_x"));
-                ns.label_offset.Y = int.Parse(s.GetAttribute("label_y"));
+                ns.LabelOffset.X = int.Parse(s.GetAttribute("label_x"));
+                ns.LabelOffset.Y = int.Parse(s.GetAttribute("label_y"));
                 try
                 {
                     var X = float.Parse(s.GetAttribute("pivot_x"));
@@ -119,10 +119,6 @@ namespace NetworkMapCreator.FileLoaders.ASCII
                     !float.TryParse(seg.GetAttribute("middlepoint_y"), out mpy))
                     mpx = mpy = 0.5f;
 
-                LineLabelDisplayMode displaymode = LineLabelDisplayMode.Default;
-                if (seg.HasAttribute("displaylinelabel"))
-                    displaymode = (LineLabelDisplayMode)Enum.Parse(typeof(LineLabelDisplayMode), seg.GetAttribute("displaylinelabel"));
-
                 SegmentLineMode linemode = SegmentLineMode.Straight;
                 if (seg.HasAttribute("mode"))
                     linemode = (SegmentLineMode)Enum.Parse(typeof(SegmentLineMode), seg.GetAttribute("mode"));
@@ -135,6 +131,10 @@ namespace NetworkMapCreator.FileLoaders.ASCII
                     if (!int.TryParse(subseg.GetAttribute("line"), out lineid))
                         return null;
 
+                    LineLabelDisplayMode displaymode = LineLabelDisplayMode.Default;
+                    if (subseg.HasAttribute("label"))
+                        displaymode = (LineLabelDisplayMode)Enum.Parse(typeof(LineLabelDisplayMode), subseg.GetAttribute("label"));
+
                     SegmentDirection direction = SegmentDirection.Default;
                     if (subseg.HasAttribute("direction"))
                         direction = (SegmentDirection)Enum.Parse(typeof(SegmentDirection), subseg.GetAttribute("direction"));
@@ -142,12 +142,12 @@ namespace NetworkMapCreator.FileLoaders.ASCII
                     var _sub = new SubSegment(llines[lineid]);
 
                     _sub.Direction = direction;
+                    _sub.LineLabelDisplay = displaymode;
 
                     segment.SubSegments.Add(_sub);
                 }
 
                 segment.MiddlePoint = new PointF(mpx, mpy);
-                segment.DisplayLineLabel = displaymode;
                 segment.LineMode = linemode;
             }
             #endregion

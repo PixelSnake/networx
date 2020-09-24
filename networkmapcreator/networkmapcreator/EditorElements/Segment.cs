@@ -23,8 +23,29 @@ namespace NetworkMapCreator.EditorElements
     public enum LineLabelDisplayMode
     {
         Default = 0,
-        Yes,
-        No
+        Visible,
+        Hidden
+    }
+
+    public static class LineLabelDisplayModeExtensions
+    {
+        public static LineLabelDisplayMode Next(this LineLabelDisplayMode l)
+        {
+            switch (l)
+            {
+                case LineLabelDisplayMode.Default:
+                    return LineLabelDisplayMode.Hidden;
+
+                case LineLabelDisplayMode.Hidden:
+                    return LineLabelDisplayMode.Visible;
+
+                case LineLabelDisplayMode.Visible:
+                    return LineLabelDisplayMode.Default;
+
+                default:
+                    return LineLabelDisplayMode.Default;
+            }
+        }
     }
 
     public class Segment : Undoable, EditorElement
@@ -46,7 +67,6 @@ namespace NetworkMapCreator.EditorElements
         private bool hover = false;
         public bool IsHovered { get { return hover; } }
         public bool IsSelected = false;
-        public LineLabelDisplayMode DisplayLineLabel = LineLabelDisplayMode.Default;
 
         public SegmentLineMode LineMode { get { return _linemode; } set { _linemode = value; LineModeChanged?.Invoke(this, value); } }
         private SegmentLineMode _linemode = SegmentLineMode.Straight;
@@ -286,7 +306,18 @@ namespace NetworkMapCreator.EditorElements
             else
                 e.Graphics.DrawLine(new Pen(Map.SelectionColor, Map.SELECTED_LINE_WIDTH), a, b);
 
-            DrawLabelOnSegment(e, a, b, seg.Line);
+            DrawLabelOnSegment(e, a, b, seg.Line, seg.LineLabelDisplay);
+
+            if (seg.Direction == SegmentDirection.Forward)
+            {
+                var arrowpos = new PointF(a.X + 0.75f * (b.X - a.X), a.Y + 0.75f * (b.Y - a.Y));
+                DrawOneWayArrow(e.Graphics, seg.Line, arrowpos, new Vector3D(b) - new Vector3D(a));
+            }
+            else if (seg.Direction == SegmentDirection.Backward)
+            {
+                var arrowpos = new PointF(a.X + 0.25f * (b.X - a.X), a.Y + 0.25f * (b.Y - a.Y));
+                DrawOneWayArrow(e.Graphics, seg.Line, arrowpos, new Vector3D(a) - new Vector3D(b));
+            }
         }
         #endregion
 
@@ -319,7 +350,20 @@ namespace NetworkMapCreator.EditorElements
                     e.Graphics.DrawPath(new Pen(Map.SelectionColor, Map.SELECTED_LINE_WIDTH), pa);
                 else
                     e.Graphics.DrawPath(new Pen(seg.Line.c1, seg.Line.Width), pa);
-
+                
+                #region Oneway Arrow Painting
+                if (seg.Direction == SegmentDirection.Forward)
+                {
+                    var arrowpos = base_curve.GetOffsetPoint(0.75f, offset);
+                    DrawOneWayArrow(e.Graphics, seg.Line, arrowpos, base_curve.GetDerivativeAt(0.75f));
+                }
+                else if (seg.Direction == SegmentDirection.Backward)
+                {
+                    var arrowpos = base_curve.GetOffsetPoint(0.25f, offset);
+                    DrawOneWayArrow(e.Graphics, seg.Line, arrowpos, base_curve.GetDerivativeAt(0.25f).Revert());
+                }
+                #endregion
+                
                 if (switch_offset)
                     offset -= Style.Margin.Left * 2 + seg.Line.Width;
                 else
@@ -462,9 +506,9 @@ namespace NetworkMapCreator.EditorElements
                     }, pa);
             }
             
-            DrawLabelOnSegment(e, begin, seg.CachedC1, seg.Line);
-            DrawLabelOnSegment(e, seg.CachedC1, seg.CachedC2, seg.Line);
-            DrawLabelOnSegment(e, seg.CachedC2, end, seg.Line);
+            DrawLabelOnSegment(e, begin, seg.CachedC1, seg.Line, seg.LineLabelDisplay);
+            DrawLabelOnSegment(e, seg.CachedC1, seg.CachedC2, seg.Line, seg.LineLabelDisplay);
+            DrawLabelOnSegment(e, seg.CachedC2, end, seg.Line, seg.LineLabelDisplay);
         }
         #endregion
 
@@ -502,6 +546,19 @@ namespace NetworkMapCreator.EditorElements
                     e.Graphics.DrawPath(new Pen(Map.SelectionColor, Map.SELECTED_LINE_WIDTH), pa);
                 else
                     e.Graphics.DrawPath(new Pen(seg.Line.c1, seg.Line.Width), pa);
+
+                #region Oneway Arrow Painting
+                if (seg.Direction == SegmentDirection.Forward)
+                {
+                    var arrowpos = base_curve.GetOffsetPoint(0.75f, offset);
+                    DrawOneWayArrow(e.Graphics, seg.Line, arrowpos, base_curve.GetDerivativeAt(0.75f));
+                }
+                else if (seg.Direction == SegmentDirection.Backward)
+                {
+                    var arrowpos = base_curve.GetOffsetPoint(0.25f, offset);
+                    DrawOneWayArrow(e.Graphics, seg.Line, arrowpos, base_curve.GetDerivativeAt(0.25f).Revert());
+                }
+                #endregion
 
                 if (switch_offset)
                     offset -= Style.Margin.Left * 2 + seg.Line.Width;
@@ -549,6 +606,28 @@ namespace NetworkMapCreator.EditorElements
         }
         #endregion
 
+        private void DrawOneWayArrow(Graphics g, Line line, Point location, Vector3D direction)
+        {
+            DrawOneWayArrow(g, line, new Point(location.X, location.Y), direction);
+        }
+        private void DrawOneWayArrow(Graphics g, Line line, PointF location, Vector3D direction)
+        {
+            direction = direction.Unit();
+            var dir_rev = direction.Revert() * (line.Width + 1);
+
+            var pr = dir_rev.Rotate(45.0f);
+            var pl = dir_rev.Rotate(-45.0f);
+
+            var loc_vec = new Vector3D(location);
+
+            var path = new GraphicsPath();
+            path.AddLine((loc_vec + direction + pr).ToPoint(), (loc_vec + direction).ToPoint());
+            path.AddLine((loc_vec + direction).ToPoint(), (loc_vec + direction + pl).ToPoint());
+
+            g.DrawPath(new Pen(new SolidBrush(Color.White), 6), path);
+            g.DrawPath(new Pen(new SolidBrush(line.c1), 2), path);
+        }
+
         private void PaintSegmentMiddlePoint(Graphics g)
         {
             int radius = 5;
@@ -563,7 +642,6 @@ namespace NetworkMapCreator.EditorElements
             g.DrawString("MiddlePoint: " + MiddlePoint, Map.DefaultFont, new SolidBrush(Color.Black), 5, 25);
             g.DrawString("MiddlePointA: " + MiddlePointA, Map.DefaultFont, new SolidBrush(Color.Black), 5, 40);
             g.DrawString("Width: " + Width, Map.DefaultFont, new SolidBrush(Color.Black), 5, 55);
-            g.DrawString("DisplayLineLabel: " + DisplayLineLabel, Map.DefaultFont, new SolidBrush(Color.Black), 5, 70);
             g.DrawString("dx: " + _dx, Map.DefaultFont, new SolidBrush(Color.Black), 5, 85);
             g.DrawString("dy: " + _dy, Map.DefaultFont, new SolidBrush(Color.Black), 5, 100);
             g.DrawString("Begin: " + Begin.Name, Map.DefaultFont, new SolidBrush(Color.Black), 5, 120);
@@ -575,10 +653,10 @@ namespace NetworkMapCreator.EditorElements
                 g.DrawString("Length: " + SubSegments[0]?.CachedCurvedPath?.GetLength(), Map.DefaultFont, new SolidBrush(Color.Black), 5, 165);
         }
 
-        private void DrawLabelOnSegment(PaintEventArgs e, Point a, Point b, Line l)
+        private void DrawLabelOnSegment(PaintEventArgs e, Point a, Point b, Line l, LineLabelDisplayMode mode)
         {
             int length = (int)new Vector3(a).Distance(new Vector3(b));
-            if ((length > Map.SEGMENT_DISPLAY_LINE_NAME_MIN_LENGTH || DisplayLineLabel == LineLabelDisplayMode.Yes) && DisplayLineLabel != LineLabelDisplayMode.No)
+            if ((length > Map.SEGMENT_DISPLAY_LINE_NAME_MIN_LENGTH || mode == LineLabelDisplayMode.Visible) && mode != LineLabelDisplayMode.Hidden)
             {
                 /* draw the line name in the middle of the segment, accordingly rotated */
                 var g = e.Graphics;
@@ -627,9 +705,6 @@ namespace NetworkMapCreator.EditorElements
             if (MiddlePoint.Y != 0.5f)
                 ret.SetAttribute("middlepoint_y", MiddlePoint.Y + "");
 
-            if (DisplayLineLabel != LineLabelDisplayMode.Default)
-                ret.SetAttribute("displaylinelabel", DisplayLineLabel + "");
-
             if (LineMode != SegmentLineMode.Straight)
                 ret.SetAttribute("mode", LineMode + "");
 
@@ -667,7 +742,6 @@ namespace NetworkMapCreator.EditorElements
             data.AddRange(BitConverter.GetBytes(end));
             data.AddRange(BitConverter.GetBytes(MiddlePoint.X));
             data.AddRange(BitConverter.GetBytes(MiddlePoint.Y));
-            data.AddRange(BitConverter.GetBytes((short)DisplayLineLabel));
             data.AddRange(BitConverter.GetBytes((short)LineMode));
 
             for (short i = 0; i < m.Lines.Count; ++i)

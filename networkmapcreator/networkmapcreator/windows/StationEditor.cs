@@ -21,7 +21,7 @@ namespace NetworkMapCreator
         {
             Stations = new Station[] { s };
             Station o = new Station(s.Map, s.Name, s.Location);
-            o.label_offset = s.label_offset;
+            o.LabelOffset = s.LabelOffset;
             o.RotationAngle = s.RotationAngle;
             o.Pivot = s.Pivot;
             Original = new Station[] { o };
@@ -44,7 +44,7 @@ namespace NetworkMapCreator
             RotationNumber.Value = (int)s.RotationAngle;
             txtName.Text = EscapeName(s.Name);
 
-            panel1.OnOffsetChanged += OnOffsetChange;
+            panel1.OffsetChanged += OnOffsetChange;
             comboProminence.SelectedIndex = (int)s.prominence;
         }
 
@@ -56,7 +56,7 @@ namespace NetworkMapCreator
             foreach (var s in stat)
             {
                 Station o = new Station(s.Map, s.Name, s.Location);
-                o.label_offset = s.label_offset;
+                o.LabelOffset = s.LabelOffset;
                 o.RotationAngle = s.RotationAngle;
                 o.Pivot = s.Pivot;
                 orig.Add(o);
@@ -68,7 +68,7 @@ namespace NetworkMapCreator
             RotationNumber.Value = 0;
             txtName.Text = "<don't change>";
 
-            panel1.OnOffsetChanged += OnOffsetChange;
+            panel1.OffsetChanged += OnOffsetChange;
 
             if (stat.Length == 1)
                 comboProminence.SelectedIndex = (int)stat[0].prominence;
@@ -105,7 +105,7 @@ namespace NetworkMapCreator
                 Stations[i].Name = Original[i].Name;
                 Stations[i].RotationAngle = Original[i].RotationAngle;
                 Stations[i].Pivot = Original[i].Pivot;
-                Stations[i].label_offset = Original[i].label_offset;
+                Stations[i].LabelOffset = Original[i].LabelOffset;
                 Stations[i].prominence = Original[i].prominence;
             }
                 
@@ -148,7 +148,7 @@ namespace NetworkMapCreator
         public void OnOffsetChange(object sender, EventArgs e)
         {
             foreach (var s in Stations)
-                s.label_offset = panel1.LabelOffset;
+                s.LabelOffset = panel1.LabelOffset;
             Form1.ActivePanel.Refresh();
         }
 
@@ -235,7 +235,7 @@ namespace NetworkMapCreator
 
         private void button3_Click(object sender, EventArgs e)
         {
-            new StationDockingPointEditor(Stations[0]).Show();
+            new ConnectionEditor(Stations[0]).Show();
         }
 
         private void comboProminence_SelectedIndexChanged(object sender, EventArgs e)

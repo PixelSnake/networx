@@ -106,13 +106,13 @@ namespace NetworkMapCreator
                         var s = (Segment)Subject;
 
                         var mode = s.LineMode;
-                        var display = s.DisplayLineLabel;
+                        //var display = s.DisplayLineLabel;
 
                         s.LineMode = SegmentData.LineMode;
-                        s.DisplayLineLabel = SegmentData.LineLabelMode;
+                        //s.DisplayLineLabel = SegmentData.LineLabelMode;
 
                         SegmentData.LineMode = mode;
-                        SegmentData.LineLabelMode = display;
+                        //SegmentData.LineLabelMode = display;
                     }
                     else if (Subject is Sticker)
                     {
@@ -157,13 +157,13 @@ namespace NetworkMapCreator
                         var s = (Segment)Subject;
 
                         var mode = s.LineMode;
-                        var display = s.DisplayLineLabel;
+                        //var display = s.DisplayLineLabel;
 
                         s.LineMode = SegmentData.LineMode;
-                        s.DisplayLineLabel = SegmentData.LineLabelMode;
+                        //s.DisplayLineLabel = SegmentData.LineLabelMode;
 
                         SegmentData.LineMode = mode;
-                        SegmentData.LineLabelMode = display;
+                        //SegmentData.LineLabelMode = display;
                     }
                     else if (Subject is Sticker)
                     {

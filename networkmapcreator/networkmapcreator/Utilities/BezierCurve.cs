@@ -160,7 +160,7 @@ namespace NetworkMapCreator.Utilities
             return pa;
         }
 
-        private PointF GetOffsetPoint(float percentage, float offset)
+        public PointF GetOffsetPoint(float percentage, float offset)
         {
             var derivative = GetDerivativeAt(percentage).Unit();
             var normal = new Vector3D(-derivative.Y, derivative.X); /* still of length 1 */
