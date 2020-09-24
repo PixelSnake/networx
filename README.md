@@ -1,5 +1,7 @@
 # NetworX
 
+Community discord: https://discord.gg/UARRq7e
+
 ## Dependencies
 - DockPanelSuite
 - DockPanelSuite.ThemeVS2015
