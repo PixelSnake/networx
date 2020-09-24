@@ -31,8 +31,7 @@ namespace NetworkMapCreator
 
             #region MAC Locking. This protects a developer build from being used by unauthorized users.
 #if DEBUG
-            Utilities.ApplicationLocking.AddMACLock("260A648B09B8");
-            Utilities.ApplicationLocking.AddMACLock("00262DA89CC9");
+            Utilities.ApplicationLocking.AddMACLock("0A0027000003");
 
             if (!Utilities.ApplicationLocking.CheckLocks())
             {

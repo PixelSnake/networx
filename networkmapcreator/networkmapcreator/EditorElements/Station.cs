@@ -9,7 +9,6 @@ using System.Drawing;
 using System.Collections.ObjectModel;
 using NetworkMapCreator.EditorElements;
 using NetworkMapCreator.Utilities;
-using NetworkMapCreator.EditorElements.Station;
 
 namespace NetworkMapCreator
 {
@@ -50,30 +49,8 @@ namespace NetworkMapCreator
 
         public StyleSet Style;
 
-        public Point LabelOffset
-        {
-            get
-            {
-                return Label.Location;
-            }
-            set
-            {
-                Label.Location = value;
-            }
-        }
-        public LabelPivot Pivot
-        {
-            get
-            {
-                return Label.Pivot;
-            }
-            set
-            {
-                Label.Pivot = value;
-            }
-        }
-
-        public string Comment = "";
+        public Point label_offset = new Point(0, 0);
+        public LabelPivot Pivot = LabelPivot.Center;
 
         private bool hover = false;
         public bool IsHovered { get { return hover; } }
@@ -85,14 +62,14 @@ namespace NetworkMapCreator
         {
             get
             {
-                return Label.Content;
+                return _name;
             }
             set
             {
-                Label.Content = value.Replace("\\n", "\n");
+                _name = value.Replace("\\n", "\n");
             }
         }
-        private StationLabel Label = new StationLabel();
+        private string _name;
 
         public Point Location
         {
@@ -268,29 +245,11 @@ namespace NetworkMapCreator
         private void ReloadStyle()
         {
             var selector = "station";
-
             if (multiple)
                 selector = "station.multiple";
             else if (Line != null && Line.IsBright)
                 selector = "station.bright";
-
             Style = Map.StyleManager.Styles[selector];
-
-            Label.Font = Line != null ? Map.Fonts[Line.Width - 1] : Map.DefaultFont;
-
-            var label_selector = "station label";
-            if (Line != null)
-            {
-                if (seg_count == 1 && prominence == Prominence.Default)
-                    label_selector = "station.ending_default label";
-                else if (prominence == Prominence.Ending)
-                    label_selector = "station.ending label";
-                else if (prominence == Prominence.All)
-                    label_selector = "station.all label";
-            }
-            Label.Style = Map.StyleManager.Styles[selector];
-
-            Label.AutoColor = Line.c1;
         }
 
         public bool MouseMove(MouseEventArgs e)
@@ -683,8 +642,7 @@ namespace NetworkMapCreator
                 g.DrawEllipse(new Pen(Map.SelectionColor1, 2), -s, -s, 2 * s, 2 * s);
             }
 
-            g.RotateTransform(RotationAngle);
-            Label.Paint(g);
+            DrawLabel(e);
 
             g.ResetTransform();
 
@@ -699,6 +657,139 @@ namespace NetworkMapCreator
                     e.Graphics.DrawString("Line: " + Line?.Name, Map.DefaultFont, new SolidBrush(Color.Black), 5, 85);
                 }
             }
+        }
+
+        public void DrawLabel(PaintEventArgs e)
+        {
+            var g = e.Graphics;
+
+            /* Get font according to line (may have different size) */
+            var Font = Line != null ? Map.Fonts[Line.Width - 1] : Map.DefaultFont;
+
+            /* Calculate label bounds */
+            var _m = g.MeasureString(Name, Font);
+            float txtw = _m.Width;
+            float txth = _m.Height;
+
+            /* Get the css selector according to the circumstances */
+            var selector = "station label";
+            if (Line != null)
+            {
+                if (seg_count == 1 && prominence == Prominence.Default)
+                    selector = "station.ending_default label";
+                else if (prominence == Prominence.Ending)
+                    selector = "station.ending label";
+                else if (prominence == Prominence.All)
+                    selector = "station.all label";
+            }
+
+            /* Load the style settings */
+            var Style = Map.StyleManager.Styles[selector];
+            var cssX = Style.X;
+            var cssY = Style.Y;
+            var cssWidth = Style.Width;
+            var cssHeight = Style.Height;
+
+            var cssPadding = Style.Padding;
+            var cssPaddingL = cssPadding.Left;
+            var cssPaddingT = cssPadding.Top;
+            var cssPaddingR = cssPadding.Right;
+            var cssPaddingB = cssPadding.Bottom;
+            var cssMargin = Style.Margin;
+            var cssMarginL = cssMargin.Left;
+            var cssMarginT = cssMargin.Top;
+            var cssMarginR = cssMargin.Right;
+            var cssMarginB = cssMargin.Bottom;
+
+            Color cssTextColor, cssBackground;
+
+            if (Line != null)
+            {
+                cssTextColor = Style.Color.GetColorAuto(Line.c1);
+                cssBackground = Style.BackgroundColor.GetColorAuto(Line.c1);
+            }
+            else
+            {
+                cssTextColor = Color.Black;
+                cssBackground = Color.Black;
+            }
+            
+            var cssBorder = Style.Border;
+
+            /* Convert label pivot to actual coordinates */
+            var p = Pivot2Point(Pivot);
+            var textloc = new Point((int)(-p.X * txtw + cssPaddingL + cssMarginL), (int)(-p.Y * txth + cssPaddingT + cssMarginT));
+
+            /* If this line color is considered "bright", we use different settings for the font color */
+            if (Line != null && Line.IsBright)
+                cssTextColor = Map.StyleManager.Styles["station label.bright"].Color.GetColorAuto(Line.c1);
+
+            var _offset_x = 0;
+            var _offset_y = 0;
+
+            /* Calculate offset */
+            switch (Style.Position)
+            {
+                case CSSPosition.Absolute:
+                    if (cssX.SizeMode == CSSSizeMode.Pixel)
+                        _offset_x = cssX.Value;
+                    else
+                        _offset_x = label_offset.X;
+                    if (cssY.SizeMode == CSSSizeMode.Pixel)
+                        _offset_y = cssY.Value;
+                    break;
+
+                case CSSPosition.Relative:
+                    _offset_x = label_offset.X;
+                    _offset_y = label_offset.Y;
+
+                    if (cssX.SizeMode == CSSSizeMode.Pixel)
+                        _offset_x += cssX.Value;
+                    if (cssY.SizeMode == CSSSizeMode.Pixel)
+                        _offset_y += cssY.Value;
+                    break;
+            }
+
+            /* We move the label to its position */
+            g.TranslateTransform(_offset_x, _offset_y);
+            g.RotateTransform(RotationAngle);
+
+            /* One line ends here */
+            if (Line != null && prominence == Prominence.Default && seg_count == 1)
+            {
+                int line_x = textloc.X + (int)txtw + cssPaddingR + cssMarginR;
+                int line_y = textloc.Y - cssPaddingT - cssMarginT; // restore original text location
+                var cssBorderWidth = cssBorder.Width.SizeMode == CSSSizeMode.Pixel ? cssBorder.Width.Value : 1;
+                var cssBorderColor = cssBorder.Color.GetColorAuto(Line.c1);
+
+                g.FillRectangle(new SolidBrush(cssBackground),           textloc.X - cssPaddingL, textloc.Y - cssPaddingT, txtw + cssPaddingL + cssPaddingR, txth + cssPaddingT + cssPaddingB);
+                g.DrawRectangle(new Pen(cssBorderColor, cssBorderWidth), textloc.X - cssPaddingL, textloc.Y - cssPaddingT, txtw + cssPaddingL + cssPaddingR, txth + cssPaddingT + cssPaddingB);
+
+                g.DrawString(Name, Font, new SolidBrush(cssTextColor), textloc);
+
+                if (Line != null)
+                    DrawLine(g, Line, (int)line_x, (int)line_y - 2, Font);
+            }
+            /* User wants to draw all ending lines or all lines */
+            else if (Line != null && prominence == Prominence.Ending || prominence == Prominence.All)
+            {
+                /* recalc text bounds because we use the bold font here */
+                _m = g.MeasureString(Name, Font);
+                txtw = _m.Width;
+                txth = _m.Height;
+                textloc = new Point((int)(-Pivot2Point(Pivot).X * txtw), (int)(-Pivot2Point(Pivot).Y * txth));
+                var trect = new RectangleF(-Pivot2Point(Pivot).X * txtw, -Pivot2Point(Pivot).Y * txth, txtw, txth);
+
+                g.DrawString(Name, Font, new SolidBrush(cssTextColor), textloc);
+
+                /* Draw the line labels */
+                if (prominence == Prominence.Ending)
+                    DrawLinesOnAnkerSide(g, lines_ending.ToArray(), trect);
+                else
+                    DrawLinesOnAnkerSide(g, Lines.ToArray(), trect);
+            }
+            else
+                g.DrawString(Name, Font, new SolidBrush(cssTextColor), textloc);
         }
 
         private static void DrawLine(Graphics g, Line l, int x, int y, Font f)
@@ -843,6 +934,78 @@ namespace NetworkMapCreator
             }
         }
 
+        public static PointF Pivot2Point(LabelPivot p)
+        {
+            switch (p)
+            {
+                case LabelPivot.BottomCenter:
+                    return new PointF(0.5f, 1.0f);
+
+                case LabelPivot.BottomLeft:
+                    return new PointF(0, 1.0f);
+
+                case LabelPivot.BottomRight:
+                    return new PointF(1.0f, 1.0f);
+
+                case LabelPivot.Center:
+                    return new PointF(0.5f, 0.5f);
+
+                case LabelPivot.CenterLeft:
+                    return new PointF(0, 0.5f);
+
+                case LabelPivot.CenterRight:
+                    return new PointF(1.0f, 0.5f);
+
+                case LabelPivot.TopCenter:
+                    return new PointF(0.5f, 0);
+
+                case LabelPivot.TopLeft:
+                    return new PointF(0, 0);
+
+                case LabelPivot.TopRight:
+                    return new PointF(1.0f, 0);
+
+                default:
+                    return new PointF(0.5f, 0.5f);
+            }
+        }
+
+        public static LabelPivot Point2Pivot(PointF p)
+        {
+            if (p.Y == 0)
+            {
+                if (p.X == 0)
+                    return LabelPivot.TopLeft;
+                else if (p.X == 0.5f)
+                    return LabelPivot.TopCenter;
+                else
+                    return LabelPivot.TopRight;
+            }
+            else if (p.Y == 0.5f)
+            {
+                if (p.X == 0)
+                    return LabelPivot.CenterLeft;
+                else if (p.X == 0.5f)
+                    return LabelPivot.Center;
+                else
+                    return LabelPivot.CenterRight;
+            }
+            else
+            {
+                if (p.X == 0)
+                    return LabelPivot.BottomLeft;
+                else if (p.X == 0.5f)
+                    return LabelPivot.BottomCenter;
+                else
+                    return LabelPivot.BottomRight;
+            }
+        }
+
+        public bool InRect(Rectangle r)
+        {
+            return r.X < Location.X && r.Y < Location.Y && r.X + r.Width > Location.X && r.Y + r.Height > Location.Y;
+        }
+
         /* Loading and Saving */
 
         public XmlElement CreateXml(XmlDocument doc)
@@ -852,8 +1015,8 @@ namespace NetworkMapCreator
             ret.SetAttribute("x", Location.X + "");
             ret.SetAttribute("y", Location.Y + "");
             ret.SetAttribute("rotation", RotationAngle + "");
-            ret.SetAttribute("label_x", LabelOffset.X + "");
-            ret.SetAttribute("label_y", LabelOffset.Y + "");
+            ret.SetAttribute("label_x", label_offset.X + "");
+            ret.SetAttribute("label_y", label_offset.Y + "");
             ret.SetAttribute("pivot", Pivot + "");
             ret.SetAttribute("prominence", prominence + "");
 
@@ -873,8 +1036,8 @@ namespace NetworkMapCreator
             data.AddRange(BitConverter.GetBytes(Location.X));
             data.AddRange(BitConverter.GetBytes(Location.Y));
             data.AddRange(BitConverter.GetBytes((short)RotationAngle));
-            data.AddRange(BitConverter.GetBytes((short)LabelOffset.X));
-            data.AddRange(BitConverter.GetBytes((short)LabelOffset.Y));
+            data.AddRange(BitConverter.GetBytes((short)label_offset.X));
+            data.AddRange(BitConverter.GetBytes((short)label_offset.Y));
             data.Add((byte)Pivot);
             data.Add((byte)prominence);
 

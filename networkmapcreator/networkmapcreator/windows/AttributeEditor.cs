@@ -26,10 +26,70 @@ namespace NetworkMapCreator.Windows
 
             Map = Form1.ActiveMap;
             Form1.ActivePanelChanged += Form1_ActivePanelChanged;
+            LabelOffsetPanel.OnOffsetChanged += LabelOffsetChanged;
+            segmentOrderEditorPanel1.Changed += (s, e) =>
+            {
+                Form1.ActivePanel.Refresh();
+            };
 
-            panel1.OffsetChanged += Panel1_OffsetChanged;
+            rdoAnkerBL.Click += AnkerChanged;
+            rdoAnkerBC.Click += AnkerChanged;
+            rdoAnkerBR.Click += AnkerChanged;
+            rdoAnkerCL.Click += AnkerChanged;
+            rdoAnkerC.Click  += AnkerChanged;
+            rdoAnkerCR.Click += AnkerChanged;
+            rdoAnkerTL.Click += AnkerChanged;
+            rdoAnkerTC.Click += AnkerChanged;
+            rdoAnkerTR.Click += AnkerChanged;
 
             RefreshSelection();
+        }
+
+        private void AnkerChanged(object sender, EventArgs e)
+        {
+            Station.LabelPivot pivot = Station.LabelPivot.BottomLeft;
+
+            if (sender == rdoAnkerBL)
+                pivot = Station.LabelPivot.BottomLeft;
+            else if (sender == rdoAnkerBC)
+                pivot = Station.LabelPivot.BottomCenter;
+            else if (sender == rdoAnkerBR)
+                pivot = Station.LabelPivot.BottomRight;
+            else if (sender == rdoAnkerCL)
+                pivot = Station.LabelPivot.CenterLeft;
+            else if (sender == rdoAnkerC)
+                pivot = Station.LabelPivot.Center;
+            else if (sender == rdoAnkerCR)
+                pivot = Station.LabelPivot.CenterRight;
+            else if (sender == rdoAnkerTL)
+                pivot = Station.LabelPivot.TopLeft;
+            else if (sender == rdoAnkerTC)
+                pivot = Station.LabelPivot.TopCenter;
+            else if (sender == rdoAnkerTR)
+                pivot = Station.LabelPivot.TopRight;
+
+            foreach (var i in Items)
+            {
+                var station = i as Station;
+                if (i == null)
+                    continue;
+
+                station.Pivot = pivot;
+            }
+
+            Form1.ActivePanel.Refresh();
+        }
+
+        private void LabelOffsetChanged(object sender, EventArgs e)
+        {
+            foreach (var i in Items)
+            {
+                if (i is Station station)
+                {
+                    station.label_offset = LabelOffsetPanel.LabelOffset;
+                    Form1.ActivePanel.Refresh();
+                }
+            }
         }
 
         private void RefreshSelection()
@@ -126,33 +186,33 @@ namespace NetworkMapCreator.Windows
             
             if (!pivot_eq.AllEqual)
             {
-                rdoAnkerLB.Checked = false;
-                rdoAnkerLM.Checked = false;
-                rdoAnkerLU.Checked = false;
+                rdoAnkerBL.Checked = false;
+                rdoAnkerBC.Checked = false;
+                rdoAnkerBR.Checked = false;
 
-                rdoAnkerMB.Checked = false;
-                rdoAnkerMM.Checked = false;
-                rdoAnkerMU.Checked = false;
+                rdoAnkerCL.Checked = false;
+                rdoAnkerC.Checked = false;
+                rdoAnkerCR.Checked = false;
 
-                rdoAnkerRB.Checked = false;
-                rdoAnkerRM.Checked = false;
-                rdoAnkerRU.Checked = false;
+                rdoAnkerTL.Checked = false;
+                rdoAnkerTC.Checked = false;
+                rdoAnkerTR.Checked = false;
             }
             else
             {
                 var val = pivot_eq.Value;
 
-                rdoAnkerLB.Checked = val == Station.LabelPivot.BottomLeft;
-                rdoAnkerLM.Checked = val == Station.LabelPivot.CenterLeft;
-                rdoAnkerLU.Checked = val == Station.LabelPivot.TopLeft;
+                rdoAnkerBL.Checked = val == Station.LabelPivot.BottomLeft;
+                rdoAnkerBC.Checked = val == Station.LabelPivot.CenterLeft;
+                rdoAnkerBR.Checked = val == Station.LabelPivot.TopLeft;
 
-                rdoAnkerMB.Checked = val == Station.LabelPivot.BottomCenter;
-                rdoAnkerMM.Checked = val == Station.LabelPivot.Center;
-                rdoAnkerMU.Checked = val == Station.LabelPivot.TopCenter;
+                rdoAnkerCL.Checked = val == Station.LabelPivot.BottomCenter;
+                rdoAnkerC.Checked = val == Station.LabelPivot.Center;
+                rdoAnkerCR.Checked = val == Station.LabelPivot.TopCenter;
 
-                rdoAnkerRB.Checked = val == Station.LabelPivot.BottomRight;
-                rdoAnkerRM.Checked = val == Station.LabelPivot.CenterRight;
-                rdoAnkerRU.Checked = val == Station.LabelPivot.TopRight;
+                rdoAnkerTL.Checked = val == Station.LabelPivot.BottomRight;
+                rdoAnkerTC.Checked = val == Station.LabelPivot.CenterRight;
+                rdoAnkerTR.Checked = val == Station.LabelPivot.TopRight;
             }
         }
 
@@ -200,13 +260,7 @@ namespace NetworkMapCreator.Windows
         private void comboLineMode_SelectionChangeCommitted(object sender, EventArgs e)
         {
         }
-
-        private void Panel1_OffsetChanged(object sender, EventArgs e)
-        {
-            foreach (Station s in Items)
-                s.LabelOffset = panel1.LabelOffset;
-            Form1.ActivePanel.Refresh();
-        }
+        #endregion
 
         private void txtName_TextChanged(object sender, EventArgs e)
         {
@@ -248,98 +302,5 @@ namespace NetworkMapCreator.Windows
 
             Form1.ActivePanel.Refresh();
         }
-
-        private void RotationNumber_ValueChanged(object sender, EventArgs e)
-        {
-            RotationTrackBar.Value = (int)RotationNumber.Value;
-            foreach (Station s in Items)
-                s.RotationAngle = (float)RotationNumber.Value;
-            Form1.ActivePanel.Refresh();
-        }
-
-        private void RotationTrackBar_ValueChanged(object sender, EventArgs e)
-        {
-            RotationNumber.Value = RotationTrackBar.Value;
-        }
-
-        private void rdoAnkerLU_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rdoAnkerLU.Checked)
-                foreach (Station s in Items)
-                    s.Pivot = Station.LabelPivot.TopLeft;
-            Form1.ActivePanel.Refresh();
-        }
-
-        private void rdoAnkerMU_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rdoAnkerMU.Checked)
-                foreach (Station s in Items)
-                    s.Pivot = Station.LabelPivot.TopCenter;
-            Form1.ActivePanel.Refresh();
-        }
-
-        private void rdoAnkerRU_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rdoAnkerRU.Checked)
-                foreach (Station s in Items)
-                    s.Pivot = Station.LabelPivot.TopRight;
-            Form1.ActivePanel.Refresh();
-        }
-
-        private void rdoAnkerLM_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rdoAnkerLM.Checked)
-                foreach (Station s in Items)
-                    s.Pivot = Station.LabelPivot.CenterLeft;
-            Form1.ActivePanel.Refresh();
-        }
-
-        private void rdoAnkerMM_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rdoAnkerMM.Checked)
-                foreach (Station s in Items)
-                    s.Pivot = Station.LabelPivot.Center;
-            Form1.ActivePanel.Refresh();
-        }
-
-        private void rdoAnkerRM_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rdoAnkerRM.Checked)
-                foreach (Station s in Items)
-                    s.Pivot = Station.LabelPivot.CenterRight;
-            Form1.ActivePanel.Refresh();
-        }
-
-        private void rdoAnkerLB_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rdoAnkerLB.Checked)
-                foreach (Station s in Items)
-                    s.Pivot = Station.LabelPivot.BottomLeft;
-            Form1.ActivePanel.Refresh();
-        }
-
-        private void rdoAnkerMB_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rdoAnkerMB.Checked)
-                foreach (Station s in Items)
-                    s.Pivot = Station.LabelPivot.BottomCenter;
-            Form1.ActivePanel.Refresh();
-        }
-
-        private void rdoAnkerRB_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rdoAnkerRB.Checked)
-                foreach (Station s in Items)
-                    s.Pivot = Station.LabelPivot.BottomRight;
-            Form1.ActivePanel.Refresh();
-        }
-
-        private void txtComment_TextChanged(object sender, EventArgs e)
-        {
-            foreach (Station s in Items)
-                s.Comment = txtComment.Text;
-            Form1.ActivePanel.Refresh();
-        }
-        #endregion
     }
 }

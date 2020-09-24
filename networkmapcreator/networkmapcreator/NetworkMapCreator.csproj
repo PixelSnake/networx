@@ -269,7 +269,7 @@
     <Compile Include="Windows\StationEditor.Designer.cs">
       <DependentUpon>StationEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="StationLabelOffsetEditorPanel.cs">
+    <Compile Include="Controls\StationLabelOffsetEditorPanel.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Windows\SegmentsOverview.cs">

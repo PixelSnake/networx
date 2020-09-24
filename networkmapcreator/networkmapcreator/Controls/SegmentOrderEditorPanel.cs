@@ -17,6 +17,8 @@ namespace NetworkMapCreator.Controls
         private Point Mouse;
         private List<RectangleF> LineBounds, ArrowUpBounds, ArrowDownBounds, LineLabelBounds, DirectionBounds;
 
+        public event EventHandler Changed;
+
         public EditorElement Source
         {
             set
@@ -115,6 +117,8 @@ namespace NetworkMapCreator.Controls
                     seg.SubSegments[i].LineLabelDisplay = seg.SubSegments[i].LineLabelDisplay.Next();
                 else if (DirectionBounds[i].Contains(e.Location))
                     seg.SubSegments[i].Direction = seg.SubSegments[i].Direction.Next();
+
+                Changed?.Invoke(this, new EventArgs());
 
                 CalculateSegmentParameters();
                 Refresh();

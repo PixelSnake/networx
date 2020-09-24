@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace NetworkMapCreator.Utilities
 {
+    /// <summary>
+    /// Takes a various amount of objects of type T and compares them for equality
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class EqualityCollector<T>
     {
         public bool AllEqual
