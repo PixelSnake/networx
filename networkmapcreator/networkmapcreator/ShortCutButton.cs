@@ -57,10 +57,7 @@ namespace NetworkMapCreator
             if (r == DialogResult.OK)
                 Text = ParseShortcut(_shortcut = s.Shortcut);
             else if (r == DialogResult.Abort)
-            {
                 Text = "None";
-                _shortcut = 0;
-            }
         }
     }
 }

@@ -48,7 +48,10 @@ Source: "..\NetworkMapCreator\NetworkMapCreator\bin\Debug\WeifenLuo.WinFormsUI.D
 Source: "..\NetworkMapCreator\NetworkMapCreator\bin\Debug\WeifenLuo.WinFormsUI.Docking.ThemeVS2015.dll"; DestDir: "{app}"; Flags: ignoreversion
 
 ; Other
-Source: "..\NetworkMapCreator\NetworkMapCreator\AppData\*"; DestDir: "{app}\ToAppData"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\NetworkMapCreator\NetworkMapCreator\bin\Debug\fonts*"; DestDir: "{app}\fonts"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\NetworkMapCreator\NetworkMapCreator\bin\Debug\example.tnm"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\NetworkMapCreator\NetworkMapCreator\AppData\shortcuts.xml"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\NetworkMapCreator\NetworkMapCreator\AppData\style\*"; DestDir: "{userappdata}\{#MyAppPublisher}\{#MyAppName}\style"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; THIS IS NEEDED; DUNNO WHY
 Source: "..\NetworkMapCreator\NetworkMapCreator\bin\Debug\NetworkMapCreator.exe.config"; DestDir: "{app}"; Flags: ignoreversion
@@ -71,7 +74,6 @@ Root: HKCR; Subkey: "TransportNetworkMap.ASCII\DefaultIcon";         ValueData: 
 Root: HKCR; Subkey: "TransportNetworkMap.ASCII\shell\open\command";  ValueData: """{app}\{#MyAppExeName}"" ""%1""";                 ValueType: string;  ValueName: ""
 ; TNB Files
 Root: HKCR; Subkey: ".tnb";                             ValueData: "TransportNetworkMap.Binary";                 Flags: uninsdeletevalue; ValueType: string;  ValueName: ""
-Root: HKCR; Subkey: "TransportNetworkMap.Binary";                     ValueData: "Transport Network Map Binary"; Flags: uninsdeletekey;   ValueType: string;  ValueName: ""
 Root: HKCR; Subkey: "TransportNetworkMap.Binary";                     ValueData: "Transport Network Map Binary"; Flags: uninsdeletekey;   ValueType: string;  ValueName: ""
 Root: HKCR; Subkey: "TransportNetworkMap.Binary\DefaultIcon";         ValueData: "{app}\nmcimageres.dll,1";                          ValueType: string;  ValueName: ""
 Root: HKCR; Subkey: "TransportNetworkMap.Binary\shell\open\command";  ValueData: """{app}\{#MyAppExeName}"" ""%1""";                 ValueType: string;  ValueName: ""

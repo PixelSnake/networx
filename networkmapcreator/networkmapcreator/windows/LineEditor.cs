@@ -14,35 +14,11 @@ namespace NetworkMapCreator
     public partial class LineEditor : DockContent
     {
         Line line;
-        public Color PrimaryColor
-        {
-            get
-            {
-                return _color1;
-            }
-            set
-            {
-                _color1 = PrimaryColorButton.BackColor = PreviewPanel.c1 = value;
-            }
-        }
-        public Color SecondaryColor
-        {
-            get
-            {
-                return _color2;
-            }
-            set
-            {
-                _color2 = SecondaryColorButton.BackColor = PreviewPanel.c2 = value;
-            }
-        }
-        private Color _color1 = Color.Transparent;
-        private Color _color2 = Color.Transparent;
+        public Color color1 = Color.Transparent, color2 = Color.Transparent;
 
         public LineEditor()
         {
             InitializeComponent();
-
             Reset(null);
             this.Bounds = new Rectangle(0, 0, 800, 800);
         }
@@ -59,26 +35,32 @@ namespace NetworkMapCreator
 
             if (l == null)
             {
-                PrimaryColor = new Color();
-                SecondaryColor = new Color();
-                PrimaryColorButton.BackColor = Color.FromArgb(0xe1e1e1);
-                SecondaryColorButton.BackColor = Color.FromArgb(0xe1e1e1);
+                color1 = new Color();
+                color2 = new Color();
+                button3.BackColor = Color.FromArgb(0xe1e1e1);
+                button4.BackColor = Color.FromArgb(0xe1e1e1);
                 txtName.Text = "";
                 trackBar1.Value = Map.DEFAULT_LINE_WIDTH;
-                PreviewPanel.linewidth = Map.DEFAULT_LINE_WIDTH;
-                PreviewPanel.Refresh();
+                panel1.c1 = new Color();
+                panel1.c2 = new Color();
+                panel1.linewidth = Map.DEFAULT_LINE_WIDTH;
+                panel1.Refresh();
                 line = null;
 
                 btnOk.Text = "Create";
             }
             else
             {
-                PrimaryColor = l.c1;
-                SecondaryColor = l.c2;
+                color1 = l.c1;
+                color2 = l.c2;
+                button3.BackColor = color1;
+                button4.BackColor = color2;
                 txtName.Text = l.Name;
                 trackBar1.Value = l.Width;
-                PreviewPanel.linewidth = l.Width;
-                PreviewPanel.Refresh();
+                panel1.c1 = l.c1;
+                panel1.c2 = l.c2;
+                panel1.linewidth = l.Width;
+                panel1.Refresh();
                 line = l;
 
                 btnOk.Text = "Ok";
@@ -90,7 +72,7 @@ namespace NetworkMapCreator
             Height = 340;
         }
 
-        private void PrimaryColorButton_Click(object sender, EventArgs e)
+        private void button3_Click(object sender, EventArgs e)
         {
             var c = Map.ColorDialog;
             c.AnyColor = true;
@@ -98,10 +80,10 @@ namespace NetworkMapCreator
 
             if (r == DialogResult.OK)
             {
-                PrimaryColorButton.BackColor = c.Color;
-                PrimaryColor = c.Color;
-                PreviewPanel.c1 = PrimaryColor;
-                PreviewPanel.Refresh();
+                button3.BackColor = c.Color;
+                color1 = c.Color;
+                panel1.c1 = color1;
+                panel1.Refresh();
             }
         }
 
@@ -119,36 +101,36 @@ namespace NetworkMapCreator
 
             if (r == DialogResult.OK)
             {
-                SecondaryColorButton.BackColor = c.Color;
-                SecondaryColor = c.Color;
-                PreviewPanel.c2 = SecondaryColor;
-                PreviewPanel.Refresh();
+                button4.BackColor = c.Color;
+                color2 = c.Color;
+                panel1.c2 = color2;
+                panel1.Refresh();
             }
         }
 
         private void button5_Click(object sender, EventArgs e)
         {
-            SecondaryColorButton.BackColor = Color.FromKnownColor(KnownColor.Control);
-            SecondaryColor = Color.Transparent;
-            PreviewPanel.c2 = SecondaryColor;
-            PreviewPanel.Refresh();
+            button4.BackColor = Color.FromKnownColor(KnownColor.Control);
+            color2 = Color.Transparent;
+            panel1.c2 = color2;
+            panel1.Refresh();
         }
 
         private void txtName_TextChanged(object sender, EventArgs e)
         {
-            PreviewPanel.label = txtName.Text;
-            PreviewPanel.Refresh();
+            panel1.label = txtName.Text;
+            panel1.Refresh();
         }
 
         private void trackBar1_Scroll(object sender, EventArgs e)
         {
-            PreviewPanel.linewidth = trackBar1.Value;
-            PreviewPanel.Refresh();
+            panel1.linewidth = trackBar1.Value;
+            panel1.Refresh();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (PrimaryColor == null || PrimaryColor == Color.Transparent)
+            if (color1 == null || color1 == Color.Transparent)
             {
                 MessageBox.Show("Primary color must be set!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -161,15 +143,15 @@ namespace NetworkMapCreator
 
             if (line == null)
             {
-                if (SecondaryColor == null || SecondaryColor == Color.Transparent)
+                if (color2 == null || color2 == Color.Transparent)
                 {
-                    var l = new Line(txtName.Text, PrimaryColor);
+                    var l = new Line(txtName.Text, color1);
                     l.Width = trackBar1.Value;
                     Form1.ActiveMap.Lines.Add(l);
                 }
                 else
                 {
-                    var l = new Line(txtName.Text, PrimaryColor, SecondaryColor);
+                    var l = new Line(txtName.Text, color1, color2);
                     l.Width = trackBar1.Value;
                     Form1.ActiveMap.Lines.Add(l);
                 }
@@ -177,8 +159,8 @@ namespace NetworkMapCreator
             else
             {
                 line.Name = txtName.Text;
-                line.c1 = PrimaryColor;
-                line.c2 = SecondaryColor;
+                line.c1 = color1;
+                line.c2 = color2;
                 line.Width = trackBar1.Value;
             }
 

@@ -103,20 +103,15 @@ namespace NetworkMapCreator
             return Math.Sqrt(dx * dx + dy * dy + dz * dz);
         }
 
-        public Vector3D Rotate(double deg)
+        public void Rotate(double deg)
         {
             var rad = deg / 180 * Math.PI;
             var sin = Math.Sin(rad);
             var cos = Math.Cos(rad);
             var nx = X * cos - Y * sin;
             var ny = X * sin + Y * cos;
-
-            return new Vector3D(nx, ny);
-        }
-
-        public Vector3D Revert()
-        {
-            return new Vector3D(-X, -Y, -Z);
+            X = nx;
+            Y = ny;
         }
 
         /* calculates the angle between this vector and v clockwise */

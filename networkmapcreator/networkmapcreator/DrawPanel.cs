@@ -503,6 +503,9 @@ namespace NetworkMapCreator
                         {
                             if (x is Station)
                             {
+                                if (!OldLocation.ContainsKey(x))
+                                    continue;
+
                                 Map.UndoManager.Push(new UndoAction(UndoActionType.Modify, (Station)x, new UndoActionDataStation()
                                 {
                                     Location = OldLocation[x]
@@ -512,6 +515,9 @@ namespace NetworkMapCreator
                             }
                             else if (x is Sticker)
                             {
+                                if (!OldLocation.ContainsKey(x))
+                                    continue;
+
                                 Map.UndoManager.Push(new UndoAction(UndoActionType.Modify, (Sticker)x, new UndoActionDataSticker()
                                 {
                                     Location = OldLocation[x],

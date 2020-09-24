@@ -12,7 +12,6 @@ using System.IO;
 using WeifenLuo.WinFormsUI.Docking;
 using WeifenLuo.WinFormsUI.ThemeVS2015;
 using NetworkMapCreator.EditorElements;
-using NetworkMapCreator.Windows;
 
 namespace NetworkMapCreator
 {
@@ -34,106 +33,58 @@ namespace NetworkMapCreator
         public delegate void ActivePanelChangedEventHandler(DrawPanel p);
         public static event ActivePanelChangedEventHandler ActivePanelChanged;
 
-        private AttributeEditor AttributeEditor;
-        private ConnectionEditor StationDockingPointEditor;
+        private static VS2015ThemeBase lightTheme = new VS2015LightTheme();
+
+
+        private StationDockingPointEditor StationDockingPointEditor;
+        private SegmentEditor SegmentEditor;
         private IconsBrowser IconsBrowser;
-        private LinesOverview LinesOverview;
+        private LinesOverview LineOverview;
         private StationsOverview StationsOverview;
         private SegmentsOverview SegmentsOverview;
         private LineEditor LineEditor;
-        private WelcomePage WelcomePage;
 
         public Form1(string[] args)
         {
             InitializeComponent();
-            gameConnectionToolStripMenuItem.Visible = Program.DeveloperMode;
 
-            LoadTheme();
+            DockPanel.Theme = lightTheme;
 
             ActivePanelChanged += Form1_ActivePanelChanged;
 
-            int files_opened = 0;
             if (args.Length > 0)
             {
                 foreach (var f in args)
                     if (System.IO.File.Exists(f))
-                    {
-                        files_opened++;
                         AddFile(new DrawPanel(IO.Load(f)));
-                    }
                 ActivePanel = Files.LastOrDefault();
+            }
+            else
+            {
+                var wp = new WelcomePage(this);
+                wp.Show(DockPanel, DockState.Document);
+
+                //AddFile(new DrawPanel(new Map()));
+                ActivePanel = Files.LastOrDefault();
+
+                wp.Activate();
             }
 
             LoadShortcuts();
 
-            AttributeEditor = new AttributeEditor();
+            StationDockingPointEditor = new StationDockingPointEditor(null);
+            SegmentEditor = new SegmentEditor();
             IconsBrowser = new IconsBrowser();
-            LinesOverview = new LinesOverview();
+            LineOverview = new LinesOverview();
             StationsOverview = new StationsOverview();
             SegmentsOverview = new SegmentsOverview();
             LineEditor = new LineEditor();
-            WelcomePage = new WelcomePage(this);
-            LoadLayout();
 
-            WelcomePage.Show(DockPanel, DockState.Document);
+            StationDockingPointEditor.Show(DockPanel, DockState.DockLeftAutoHide);
+            SegmentEditor.Show(DockPanel, DockState.DockLeftAutoHide);
+            IconsBrowser.Show(DockPanel, DockState.DockRightAutoHide);
 
             Program.CheckUpdates();
-        }
-
-        private void LoadTheme()
-        {
-            switch (Program.Config.Theme)
-            {
-                default:
-                    DockPanel.Theme = new VS2015LightTheme();
-                    break;
-
-                case "dark":
-                    DockPanel.Theme = new VS2015DarkTheme();
-                    break;
-
-                case "blue":
-                    DockPanel.Theme = new VS2015BlueTheme();
-                    break;
-            }
-        }
-
-        private void LoadLayout()
-        {
-            if (!File.Exists(Program.APPDATA + "layout.xml"))
-                File.WriteAllText(Program.APPDATA + "layout.xml", Properties.Resources.layout_default, Encoding.Unicode);
-
-            DockPanel.LoadFromXml(Program.APPDATA + "layout.xml", (typename) =>
-            {
-                switch (typename)
-                {
-                    case "NetworkMapCreator.WelcomePage":
-                        return WelcomePage;
-
-                    case "NetworkMapCreator.Windows.AttributeEditor":
-                        return AttributeEditor;
-
-                    case "NetworkMapCreator.IconsBrowser":
-                        return IconsBrowser;
-
-                    case "NetworkMapCreator.LinesOverview":
-                        return LinesOverview;
-
-                    case "NetworkMapCreator.StationsOverview":
-                        return StationsOverview;
-
-                    case "NetworkMapCreator.SegmentsOverview":
-                        return SegmentsOverview;
-
-                    default:
-                        return null;
-                }
-            });
-        }
-
-        private void SaveLayout()
-        {
-            DockPanel.SaveAsXml(Program.APPDATA + "layout.xml");
         }
 
         private void Form1_ActivePanelChanged(DrawPanel p)
@@ -166,6 +117,9 @@ namespace NetworkMapCreator
 
                 undoToolStripMenuItem.ShortcutKeys = (Keys)int.Parse(shortcuts["ScEditUndo"].GetAttribute("shortcut"));
                 redoToolStripMenuItem.ShortcutKeys = (Keys)int.Parse(shortcuts["ScEditRedo"].GetAttribute("shortcut"));
+                openTrackEditorToolStripMenuItem.ShortcutKeys = (Keys)int.Parse(shortcuts["ScEditTrackEditor"].GetAttribute("shortcut"));
+                openStationEditorToolStripMenuItem.ShortcutKeys = (Keys)int.Parse(shortcuts["ScEditStationEditor"].GetAttribute("shortcut"));
+                openConnectionEditorToolStripMenuItem.ShortcutKeys = (Keys)int.Parse(shortcuts["ScConnectionEditor"].GetAttribute("shortcut"));
                 selectStylesheetToolStripMenuItem.ShortcutKeys = (Keys)int.Parse(shortcuts["ScEditSelectStylesheet"].GetAttribute("shortcut"));
                 settingsToolStripMenuItem.ShortcutKeys = (Keys)int.Parse(shortcuts["ScEditSettings"].GetAttribute("shortcut"));
 
@@ -493,7 +447,7 @@ namespace NetworkMapCreator
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            SaveLayout();
+
         }
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
@@ -514,13 +468,16 @@ namespace NetworkMapCreator
 
         private void linesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (LinesOverview.IsDisposed)
-                LinesOverview = new LinesOverview();
-            LinesOverview.Show(DockPanel, DockState.Float);
+            if (LineOverview.IsDisposed)
+                LineOverview = new LinesOverview();
+            LineOverview.Show(DockPanel, DockState.Float);
         }
 
         private void openTrackEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (SegmentEditor.IsDisposed)
+                SegmentEditor = new SegmentEditor();
+            SegmentEditor.Show(DockPanel, DockState.Float);
         }
 
         private void openStationEditorToolStripMenuItem_Click(object sender, EventArgs e)
@@ -611,10 +568,6 @@ namespace NetworkMapCreator
         {
             if (LineEditor.IsDisposed)
                 LineEditor = new LineEditor();
-
-            if (ActiveMap.Lines.LastOrDefault() != null)
-                LineEditor.PrimaryColor = Utilities.Colors.ColorUtilities.GetNextMatchingColor(ActiveMap.Lines.LastOrDefault().c1);
-
             LineEditor.Show(DockPanel, DockState.Float);
         }
 
@@ -702,7 +655,7 @@ namespace NetworkMapCreator
         private void openConnectionEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (StationDockingPointEditor.IsDisposed)
-                StationDockingPointEditor = new ConnectionEditor(null);
+                StationDockingPointEditor = new StationDockingPointEditor(null);
             StationDockingPointEditor.Show(DockPanel, DockState.Float);
         }
 
@@ -747,23 +700,6 @@ namespace NetworkMapCreator
 
             if (ActivePanel != null)
                 ActivePanel.Refresh();
-        }
-
-        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
-        {
-
-        }
-
-        private void newToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            new Windows.GameConnectionDialog().ShowDialog();
-        }
-
-        private void attributeEditorToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (AttributeEditor.IsDisposed)
-                AttributeEditor = new AttributeEditor();
-            AttributeEditor.Show(DockPanel, DockState.DockRight);
         }
     }
 }

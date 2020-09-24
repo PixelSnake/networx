@@ -29,6 +29,8 @@ namespace NetworkMapCreator
 
             Map.SegmentsChanged += SegmentsChanged;
 
+            list.MouseDoubleClick += list_MouseDoubleClick;
+
             SegmentsChanged();
         }
 
@@ -53,6 +55,26 @@ namespace NetworkMapCreator
             }));
         }
 
+        private void editToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                List<Segment> segs = new List<Segment>();
+                Map.ForEachSegment(new Action<Segment>((s) =>
+                {
+                    if (s.IsSelected)
+                        segs.Add(s);
+                }));
+
+                if (segs.Count == 0)
+                    return;
+
+                if (new SegmentEditor(segs.ToArray()).ShowDialog() == DialogResult.OK)
+                    Refresh();
+            }
+            catch (Exception) { }
+        }
+
         private void list_SelectedIndexChanged_1(object sender, EventArgs e)
         {
             try
@@ -65,6 +87,28 @@ namespace NetworkMapCreator
                         Map.Select(s);
                 }));
                 Owner.Refresh();
+            }
+            catch (Exception) { }
+        }
+
+        private void list_MouseDoubleClick(object sender, EventArgs e)
+        {
+            if (list.SelectedItems.Count < 1)
+                return;
+
+            try
+            {
+                if (list.SelectedItems.Count < 2)
+                    new SegmentEditor(list.SelectedItem as Segment).ShowDialog();
+                else
+                {
+                    var selection = new List<Segment>();
+                    foreach (var s in list.SelectedItems)
+                        if (s as Segment != null)
+                            selection.Add(s as Segment);
+
+                    new SegmentEditor(selection.ToArray()).ShowDialog();
+                }
             }
             catch (Exception) { }
         }

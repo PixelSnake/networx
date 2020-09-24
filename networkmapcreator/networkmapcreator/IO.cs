@@ -236,8 +236,8 @@ namespace NetworkMapCreator
 
                                 var ns = new Station(m, Name, new Point(X, Y));
                                 ns.RotationAngle = Rotation;
-                                ns.LabelOffset.X = LabelX;
-                                ns.LabelOffset.Y = LabelY;
+                                ns.label_offset.X = LabelX;
+                                ns.label_offset.Y = LabelY;
                                 ns.Pivot = Pivot;
                                 ns.prominence = Prominence;
 
@@ -283,6 +283,7 @@ namespace NetworkMapCreator
                                 var b = m.Stations[EndID];
                                 var s = m.AddSegment(a, b, m.Lines[LineID]);
                                 s.MiddlePoint = new PointF(MiddlepointX, MiddlepointY);
+                                s.DisplayLineLabel = DisplayLineLabel;
                                 s.LineMode = LineMode;
 
                                 lsegments.Add(s);
@@ -370,11 +371,11 @@ namespace NetworkMapCreator
                 PointF pivot = Station.Pivot2Point(s.Pivot);
 
                 // without height and width
-                int lx_ = (int)(s.Location.X + s.LabelOffset.X - pivot.X * tw) - margin;
-                int ly_ = (int)(s.Location.Y + s.LabelOffset.Y - pivot.Y * th) - margin;
+                int lx_ = (int)(s.Location.X + s.label_offset.X - pivot.X * tw) - margin;
+                int ly_ = (int)(s.Location.Y + s.label_offset.Y - pivot.Y * th) - margin;
                 // x and y with height and width
-                int lxw = (int)(s.Location.X + s.LabelOffset.X + (pivot.X * tw + tw)) + margin * 2;
-                int lyh = (int)(s.Location.Y + s.LabelOffset.Y + (pivot.Y * th + th)) + margin * 2;
+                int lxw = (int)(s.Location.X + s.label_offset.X + (pivot.X * tw + tw)) + margin * 2;
+                int lyh = (int)(s.Location.Y + s.label_offset.Y + (pivot.Y * th + th)) + margin * 2;
 
                 int x_ = Math.Max(lxw, s.Location.X);
                 int y_ = Math.Max(lyh, s.Location.Y);
@@ -434,39 +435,31 @@ namespace NetworkMapCreator
         {
             var ret = new List<string>();
 
-            try
+            if (!File.Exists(Program.APPDATA + "recent"))
             {
-                if (!File.Exists(Program.APPDATA + "recent"))
-                {
-                    Directory.CreateDirectory(Program.APPDATA);
-                    File.AppendAllText(Program.APPDATA + "recent", "example.tnm\n");
-                    ret.Add("example.tnm");
-                    return ret;
-                }
-
-                var list = File.ReadAllLines(Program.APPDATA + "recent");
-
-                if (list.Length < 1)
-                    return ret;
-
-                for (int i = list.Length - 1; i >= 0 && i >= list.Length - 6; --i)
-                    if (!ret.Contains(list[i]) && File.Exists(list[i]))
-                        ret.Add(list[i]);
+                Directory.CreateDirectory(Program.APPDATA);
+                File.CreateText(Program.APPDATA + "recent");
+                File.AppendAllText(Program.APPDATA + "recent", "example.tnm\n");
+                return ret;
             }
-            catch (Exception) { }
+
+            var list = File.ReadAllLines(Program.APPDATA + "recent");
+
+            if (list.Length < 1)
+                return ret;
+
+            for (int i = list.Length - 1; i >= 0 && i >= list.Length - 6; --i)
+                if (!ret.Contains(list[i]) && File.Exists(list[i]))
+                    ret.Add(list[i]);
 
             return ret;
         }
 
         public static void AddRecent(string path)
         {
-            try
-            {
-                var list = LoadRecent();
-                list.Add(path); /* Add it anyway, so that it appears on the top */
-                File.WriteAllLines(Program.APPDATA + "recent", list);
-            }
-            catch (Exception) { }
+            var list = LoadRecent();
+            list.Add(path); /* Add it anyway, so that it appears on the top */
+            File.WriteAllLines(Program.APPDATA + "recent", list);
         }
     }
 }

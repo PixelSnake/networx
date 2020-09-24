@@ -15,8 +15,6 @@ namespace NetworkMapCreator
         public ImageGrid()
         {
             InitializeComponent();
-            DoubleBuffered = true;
-
             this.DrawMode = DrawMode.OwnerDrawVariable;
             this.ItemHeight = 32;
         }

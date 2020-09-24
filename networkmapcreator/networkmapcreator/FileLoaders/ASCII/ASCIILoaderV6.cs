@@ -75,8 +75,8 @@ namespace NetworkMapCreator.FileLoaders.ASCII
                 p.Y = int.Parse(s.GetAttribute("y"));
                 var ns = new Station(m, name, p);
                 ns.RotationAngle = int.Parse(s.GetAttribute("rotation"));
-                ns.LabelOffset.X = int.Parse(s.GetAttribute("label_x"));
-                ns.LabelOffset.Y = int.Parse(s.GetAttribute("label_y"));
+                ns.label_offset.X = int.Parse(s.GetAttribute("label_x"));
+                ns.label_offset.Y = int.Parse(s.GetAttribute("label_y"));
                 try
                 {
                     var X = float.Parse(s.GetAttribute("pivot_x"));
@@ -120,16 +120,14 @@ namespace NetworkMapCreator.FileLoaders.ASCII
                 if (float.IsNaN(mpy) || mpy == 0.0f)
                     mpy = 0.5f;
 
-                var dll = (LineLabelDisplayMode)Enum.Parse(typeof(LineLabelDisplayMode), LineLabelDisplayModeLegacyConverter(seg.GetAttribute("displaylinelabel")));
+                var dll = (LineLabelDisplayMode)Enum.Parse(typeof(LineLabelDisplayMode), seg.GetAttribute("displaylinelabel"));
                 var mode = (SegmentLineMode)Enum.Parse(typeof(SegmentLineMode), seg.GetAttribute("mode"));
 
                 var s = m.AddSegment(a, b, l);
 
                 s.MiddlePoint = new PointF(mpx, mpy);
                 s.LineMode = mode;
-
-                if (s.SubSegments.LastOrDefault() != null)
-                    s.SubSegments.LastOrDefault().LineLabelDisplay = dll;
+                s.DisplayLineLabel = dll;
             }
             #endregion
 
@@ -164,21 +162,6 @@ namespace NetworkMapCreator.FileLoaders.ASCII
             #endregion
 
             return m;
-        }
-
-        private string LineLabelDisplayModeLegacyConverter(string val)
-        {
-            switch (val)
-            {
-                case "Yes":
-                    return "Visible";
-
-                case "No":
-                    return "Hidden";
-
-                default:
-                    return val;
-            }
         }
     }
 }
