@@ -209,25 +209,28 @@ namespace NetworkMapCreator
             for (int i = 0; i < lists.Count(); ++i)
                 for (int j = 0; j < lists[i].Count; ++j)
                 {
-                    var s = lists[i][j];
+                    var segment = lists[i][j];
 
-                    var p = Station.GetDockingLocation(s);
+                    var p = Station.GetDockingLocation(segment);
                     p.X -= Station.Location.X;
                     p.Y -= Station.Location.Y;
-                    var lw = (int)(1.8 * s.Width);
+                    var lineWidth = (int)(1.8 * segment.Width);
 
                     var x_coefficient = Math.Cos(i * Math.PI / 2);
                     var y_coefficient = -Math.Sin(i * Math.PI / 2);
 
                     var p1 = new PointF(p.X, p.Y);
                     var p2 = new PointF(
-                        (float)(p1.X - this.Width * x_coefficient + lw / 2),
-                        (float)(p1.Y + this.Height * y_coefficient) + lw / 2);
+                        (float)(p1.X - this.Width * x_coefficient + lineWidth / 2),
+                        (float)(p1.Y + this.Height * y_coefficient) + lineWidth / 2);
 
-                    if (hover.Item1 == i && hover.Item2 == j)
-                        g.DrawLine(new Pen(Color.FromArgb(0x7F, s.Line.c1), lw), p1, p2);
-                    else
-                        g.DrawLine(new Pen(s.Line.c1, lw), p1, p2);
+                    foreach (var subsegment in segment.SubSegments)
+                    {
+                        if (hover.Item1 == i && hover.Item2 == j)
+                            g.DrawLine(new Pen(Color.FromArgb(0x7F, subsegment.Line.c1), lineWidth), p1, p2);
+                        else
+                            g.DrawLine(new Pen(subsegment.Line.c1, lineWidth), p1, p2);
+                    }
                 }
 
             var ge = new System.Drawing.Extended.ExtendedGraphics(g);
