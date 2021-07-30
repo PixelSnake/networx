@@ -36,18 +36,20 @@
             this.lnkOpen = new System.Windows.Forms.LinkLabel();
             this.label1 = new System.Windows.Forms.Label();
             this.recentContainer = new System.Windows.Forms.TableLayoutPanel();
+            this.label3 = new System.Windows.Forms.Label();
+            this.lblVersion = new System.Windows.Forms.Label();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.label2 = new System.Windows.Forms.Label();
             this.tableRedditPosts = new System.Windows.Forms.TableLayoutPanel();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.errorLabel = new System.Windows.Forms.Label();
             this.wpfSpinner = new System.Windows.Forms.Integration.ElementHost();
             this.metroSpinner1 = new NetworkMapCreator.Controls.MetroSpinner();
-            this.label3 = new System.Windows.Forms.Label();
-            this.lblVersion = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
+            this.tableRedditPosts.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -62,7 +64,7 @@
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(844, 434);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1161, 522);
             this.tableLayoutPanel1.TabIndex = 0;
             this.tableLayoutPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel1_Paint);
             // 
@@ -73,7 +75,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(3, 3);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(234, 428);
+            this.panel1.Size = new System.Drawing.Size(234, 516);
             this.panel1.TabIndex = 0;
             // 
             // tableLayoutPanel2
@@ -98,7 +100,7 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(234, 428);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(234, 516);
             this.tableLayoutPanel2.TabIndex = 0;
             // 
             // lnkNew
@@ -155,8 +157,28 @@
             this.recentContainer.Name = "recentContainer";
             this.recentContainer.RowCount = 1;
             this.recentContainer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.recentContainer.Size = new System.Drawing.Size(228, 170);
+            this.recentContainer.Size = new System.Drawing.Size(228, 258);
             this.recentContainer.TabIndex = 3;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Segoe UI Light", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(22, 22);
+            this.label3.Margin = new System.Windows.Forms.Padding(22);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(149, 47);
+            this.label3.TabIndex = 4;
+            this.label3.Text = "NetworX";
+            // 
+            // lblVersion
+            // 
+            this.lblVersion.AutoSize = true;
+            this.lblVersion.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.lblVersion.Location = new System.Drawing.Point(3, 503);
+            this.lblVersion.Name = "lblVersion";
+            this.lblVersion.Size = new System.Drawing.Size(228, 13);
+            this.lblVersion.TabIndex = 5;
             // 
             // tableLayoutPanel3
             // 
@@ -172,7 +194,7 @@
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(598, 428);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(915, 516);
             this.tableLayoutPanel3.TabIndex = 1;
             // 
             // label2
@@ -191,49 +213,41 @@
             this.tableRedditPosts.AutoScroll = true;
             this.tableRedditPosts.ColumnCount = 1;
             this.tableRedditPosts.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableRedditPosts.Controls.Add(this.errorLabel, 0, 0);
             this.tableRedditPosts.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableRedditPosts.Location = new System.Drawing.Point(3, 120);
             this.tableRedditPosts.Name = "tableRedditPosts";
             this.tableRedditPosts.RowCount = 1;
             this.tableRedditPosts.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableRedditPosts.Size = new System.Drawing.Size(592, 305);
+            this.tableRedditPosts.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 393F));
+            this.tableRedditPosts.Size = new System.Drawing.Size(909, 393);
             this.tableRedditPosts.TabIndex = 1;
+            // 
+            // errorLabel
+            // 
+            this.errorLabel.AutoSize = true;
+            this.errorLabel.Location = new System.Drawing.Point(3, 0);
+            this.errorLabel.Name = "errorLabel";
+            this.errorLabel.Size = new System.Drawing.Size(133, 13);
+            this.errorLabel.TabIndex = 0;
+            this.errorLabel.Text = "Unable to load reddit posts";
+            this.errorLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // wpfSpinner
             // 
             this.wpfSpinner.Dock = System.Windows.Forms.DockStyle.Fill;
             this.wpfSpinner.Location = new System.Drawing.Point(3, 43);
             this.wpfSpinner.Name = "wpfSpinner";
-            this.wpfSpinner.Size = new System.Drawing.Size(592, 71);
+            this.wpfSpinner.Size = new System.Drawing.Size(909, 71);
             this.wpfSpinner.TabIndex = 4;
             this.wpfSpinner.Text = "elementHost1";
             this.wpfSpinner.Child = this.metroSpinner1;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Segoe UI Light", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(22, 22);
-            this.label3.Margin = new System.Windows.Forms.Padding(22);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(149, 47);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "NetworX";
-            // 
-            // lblVersion
-            // 
-            this.lblVersion.AutoSize = true;
-            this.lblVersion.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.lblVersion.Location = new System.Drawing.Point(3, 415);
-            this.lblVersion.Name = "lblVersion";
-            this.lblVersion.Size = new System.Drawing.Size(228, 13);
-            this.lblVersion.TabIndex = 5;
             // 
             // WelcomePage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(844, 434);
+            this.ClientSize = new System.Drawing.Size(1161, 522);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "WelcomePage";
             this.Text = "WelcomePage";
@@ -244,6 +258,8 @@
             this.tableLayoutPanel2.PerformLayout();
             this.tableLayoutPanel3.ResumeLayout(false);
             this.tableLayoutPanel3.PerformLayout();
+            this.tableRedditPosts.ResumeLayout(false);
+            this.tableRedditPosts.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -265,5 +281,6 @@
         private Controls.MetroSpinner metroSpinner1;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label lblVersion;
+        private System.Windows.Forms.Label errorLabel;
     }
 }

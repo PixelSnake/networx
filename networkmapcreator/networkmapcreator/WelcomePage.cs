@@ -89,56 +89,66 @@ namespace NetworkMapCreator
         {
             if (reddit_loaded)
                 return;
+
+            wpfSpinner.Invoke(new Action(() => { wpfSpinner.Visible = true; }));
+
             reddit_loaded = true;
+            errorLabel.Invoke(new Action(() => { errorLabel.Visible = false; }));
 
             new Thread(() =>
             {
-                var reddit = new Reddit();
-                var sub = reddit.GetSubreddit("/r/networx");
-                string[] filter = { "INFORMATION", "IMPORTANT" };
-                int important_posts = 0;
-
-                foreach (var post in sub.New.TakeWhile(p => {
-                    if (filter.Contains(p.LinkFlairText))
-                        important_posts++;
-                    return important_posts < 5;
-                }))
+                try
                 {
-                    if (!filter.Contains(post.LinkFlairText))
-                        continue;
+                    var reddit = new Reddit();
+                    var sub = reddit.GetSubreddit("/r/networx");
+                    string[] filter = { "INFORMATION", "IMPORTANT" };
+                    int important_posts = 0;
 
-                    var pcontrol = new Controls.RedditPost()
+                    foreach (var post in sub.New.TakeWhile(p => {
+                        if (filter.Contains(p.LinkFlairText))
+                            important_posts++;
+                        return important_posts < 5;
+                    }))
                     {
-                        Title = post.Title,
-                        Content = post.SelfText,
-                        Dock = DockStyle.Fill
-                    };
-                    pcontrol.Click += (s, evt) => {
-                        if (post.IsSelfPost)
-                            System.Diagnostics.Process.Start("http://www.reddit.com" + post.Permalink.ToString());
-                        else
-                            System.Diagnostics.Process.Start(post.Url.ToString());
-                    };
-                    toolTip.SetToolTip(pcontrol, "Click to see more");
+                        if (!filter.Contains(post.LinkFlairText))
+                            continue;
+
+                        var pcontrol = new Controls.RedditPost()
+                        {
+                            Title = post.Title,
+                            Content = post.SelfText,
+                            Dock = DockStyle.Fill
+                        };
+                        pcontrol.Click += (s, evt) => {
+                            if (post.IsSelfPost)
+                                System.Diagnostics.Process.Start("http://www.reddit.com" + post.Permalink.ToString());
+                            else
+                                System.Diagnostics.Process.Start(post.Url.ToString());
+                        };
+                        toolTip.SetToolTip(pcontrol, "Click to see more");
+
+                        tableRedditPosts.Invoke(new Action(() =>
+                        {
+                            tableRedditPosts.RowCount++;
+                            tableRedditPosts.RowStyles.Insert(0, new RowStyle(SizeType.AutoSize));
+                            tableRedditPosts.Controls.Add(pcontrol, 1, tableRedditPosts.RowCount - 1);
+                        }));
+
+                    }
 
                     tableRedditPosts.Invoke(new Action(() =>
                     {
                         tableRedditPosts.RowCount++;
                         tableRedditPosts.RowStyles.Insert(0, new RowStyle(SizeType.AutoSize));
-                        tableRedditPosts.Controls.Add(pcontrol, 1, tableRedditPosts.RowCount - 1);
+                        tableRedditPosts.Controls.Add(new Label(), 1, tableRedditPosts.RowCount - 1);
                     }));
-                    
-                }
 
-                tableRedditPosts.Invoke(new Action(() =>
+                    wpfSpinner.Invoke(new Action(() => { wpfSpinner.Visible = false; }));
+                } catch (Exception)
                 {
-                    tableRedditPosts.RowCount++;
-                    tableRedditPosts.RowStyles.Insert(0, new RowStyle(SizeType.AutoSize));
-                    tableRedditPosts.Controls.Add(new Label(), 1, tableRedditPosts.RowCount - 1);
-                }));
-
-                wpfSpinner.Invoke(new Action(() => { wpfSpinner.Visible = false; }));
-
+                    wpfSpinner.Invoke(new Action(() => { wpfSpinner.Visible = false; }));
+                    errorLabel.Invoke(new Action(() => { errorLabel.Visible = true; }));
+                }
             }).Start();
         }
 
