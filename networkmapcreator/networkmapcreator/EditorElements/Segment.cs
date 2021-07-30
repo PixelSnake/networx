@@ -35,7 +35,7 @@ namespace NetworkMapCreator.EditorElements
         public StyleSet Style;
 
         public Station Begin, End;
-        [System.Obsolete]
+        [Obsolete("A segment doesnt have a Line anymore. Use the Line property of the segments in SubSegments")]
         public Line Line;
         public ObservableCollection<SubSegment> SubSegments = new ObservableCollection<SubSegment>();
 
