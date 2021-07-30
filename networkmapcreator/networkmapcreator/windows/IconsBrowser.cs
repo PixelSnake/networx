@@ -137,10 +137,16 @@ namespace NetworkMapCreator
         {
             var request = WebRequest.Create(link);
 
-            using (var response = request.GetResponse())
-            using (var stream = response.GetResponseStream())
+            try
             {
-                return Bitmap.FromStream(stream);
+                using (var response = request.GetResponse())
+                using (var stream = response.GetResponseStream())
+                {
+                    return Bitmap.FromStream(stream);
+                }
+            } catch (Exception)
+            {
+                return null;
             }
         }
 
